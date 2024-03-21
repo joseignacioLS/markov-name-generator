@@ -1,5 +1,3 @@
-import { hyphenate } from "hyphen/es";
-
 export class Markov {
   private window: number;
   private starters: string[];
@@ -60,14 +58,8 @@ export class Markov {
 
   private adjust_probs(): void {
     for (const key in this.data) {
-      let total = 0;
-      for (const subkey in this.data[key]) {
-        total += this.data[key][subkey];
-      }
-
-      for (const subkey in this.data[key]) {
-        this.data[key][subkey] /= total;
-      }
+      const total = Object.keys(this.data[key]).reduce((acc, subkey) => acc + this.data[key][subkey], 0);
+      Object.keys(this.data[key]).forEach((subkey) => this.data[key][subkey] /= total);
     }
   }
 
@@ -86,17 +78,15 @@ export class Markov {
     const n = Math.random();
 
     let t_prob = 0;
-    let addition = "";
-
     for (const key in options) {
       if (t_prob + options[key] >= n) {
-        addition = key;
-        break;
+        return prediction + key;
       } else {
         t_prob += options[key];
       }
     }
-    return prediction + addition;
+    return prediction
+
   }
 
   predict(min_length: number = 6, max_length: number = 10): string {
@@ -118,7 +108,7 @@ export class Markov {
     }
 
     if (safe === 0) {
-      return "-error-";
+      return "";
     }
     return prediction.replace(".", "");
   }

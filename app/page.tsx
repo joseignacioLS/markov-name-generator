@@ -64,6 +64,7 @@ export default function Home() {
   const handleNameCreation = (): void => {
     if (!markov) return;
     const newName: string = markov.predict(+input.minLength, +input.maxLength);
+    if (newName === "") return;
     setPredictions((oldState) => {
       return [
         {
