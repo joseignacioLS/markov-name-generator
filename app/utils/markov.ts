@@ -17,32 +17,6 @@ export class Markov {
     this.data = {};
   }
 
-  private async process_word_by_syllables(raw_name: string): Promise<void> {
-    const syllables: string[] = [];
-
-    for (const word of raw_name.split(" ")) {
-      const splittedWord = await (await hyphenate(word)).split("-");
-      syllables.push(...splittedWord);
-      syllables.push(" ");
-    }
-    syllables[syllables.length - 1] = ".";
-
-    for (let i = 0; i < syllables.length - this.window; i++) {
-      const base = syllables.slice(i, i + this.window).join("");
-      if (i === 0) {
-        this.starters.push(base);
-      }
-      if (!this.data[base]) {
-        this.data[base] = {};
-      }
-      const next_syllable = syllables[i + this.window];
-      if (!this.data[base][next_syllable]) {
-        this.data[base][next_syllable] = 0;
-      }
-      this.data[base][next_syllable]++;
-    }
-  }
-
   private process_word(raw_name: string): void {
     const chars = Array.from(raw_name);
     if (raw_name.length <= this.window) {
@@ -70,15 +44,18 @@ export class Markov {
     }
   }
 
-  generate_markov(words: string[], window: number): void {
-    this.init_values();
-    this.window = window;
+  async generate_markov(words: string[], window: number): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.init_values();
+      this.window = window;
 
-    for (const name of words) {
-      this.process_word(name);
-    }
+      for (const name of words) {
+        this.process_word(name);
+      }
 
-    this.adjust_probs();
+      this.adjust_probs();
+      resolve(true);
+    });
   }
 
   private adjust_probs(): void {

@@ -28,6 +28,7 @@ interface IPrediction {
 }
 
 export default function Home() {
+  const [markovTraining, setMarkovTraining] = useState(false);
   const [trainData, setTrainData] = useState<string[]>([]);
   const [predictions, setPredictions] = useState<IPrediction[]>([]);
   const [input, setInput] = useState<{
@@ -87,7 +88,10 @@ export default function Home() {
   };
 
   const initModel = async (): Promise<void> => {
-    markov.generate_markov(trainData, +input.window);
+    setMarkovTraining(true);
+    markov.generate_markov(trainData, +input.window).then((r) => {
+      setMarkovTraining(false);
+    });
   };
 
   useEffect(() => {
@@ -103,7 +107,9 @@ export default function Home() {
       <h1 className={styles.title}>Generador de Nombres de Ciudades</h1>
       <div className={styles.predictor}>
         <section className={styles.inputs}></section>
-        <Button onClick={handleNameCreation}>+</Button>
+        <Button onClick={handleNameCreation} disabled={markovTraining}>
+          +
+        </Button>
         <div ref={predictionsRef} className={styles.predictionsWrapper}>
           {predictions.map((prediction) => (
             <p
