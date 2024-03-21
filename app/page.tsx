@@ -1,95 +1,160 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+
+import { ChangeEvent, useEffect, useRef, useState } from "react";
+import styles from "./page.module.scss";
+import { Markov } from "./utils/markov";
+import RangeInput from "./components/RangeInput/RangeInput";
+import { generateId } from "./utils/other";
+import ToggleCard from "./components/ToggleCard/ToggleCard";
+import SelectInput from "./components/SelectInput/SelectInput";
+import Button from "./components/Button/Button";
+
+const markov = new Markov();
+
+export const windowToColor: { [key: number]: string } = {
+  1: "#001C47", // Substituted for background color
+  2: "#193559",
+  3: "#32416C",
+  4: "#4B5D7F",
+  5: "#647992",
+  6: "#7D95A5", // Substituted for highlight color
+};
+
+interface IPrediction {
+  id: number;
+  value: string;
+  length: number;
+  window: number;
+}
 
 export default function Home() {
+  const [trainData, setTrainData] = useState<string[]>([]);
+  const [predictions, setPredictions] = useState<IPrediction[]>([]);
+  const [input, setInput] = useState<{
+    window: string;
+    minLength: string;
+    maxLength: string;
+    source: string;
+  }>({
+    window: "3",
+    minLength: "6",
+    maxLength: "12",
+    source: "/data/spain.txt",
+  });
+
+  const predictionsRef = useRef(null);
+
+  const resetPredictionsScroll = () => {
+    if (!predictionsRef?.current) return;
+    const element = predictionsRef.current as any;
+    element.scrollTo({ top: 0 });
+  };
+
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
+  ) => {
+    const { name, value }: { name: string; value: string } = e.target;
+
+    setInput((oldState) => {
+      return { ...oldState, [name]: value };
+    });
+  };
+
+  const handleNameCreation = (): void => {
+    if (!markov) return;
+    const newName: string = markov.predict(+input.minLength, +input.maxLength);
+    setPredictions((oldState) => {
+      return [
+        {
+          id: generateId(),
+          value: newName,
+          length: newName.length,
+          window: +input.window,
+        },
+        ...oldState.slice(0, 25),
+      ];
+    });
+    setTimeout(resetPredictionsScroll, 0);
+  };
+
+  const getTrainData = async (source = "/data/spain.txt"): Promise<void> => {
+    const request = await fetch(source);
+    const response: string = await request.text();
+
+    setTrainData(
+      response.split("\n").map((n) => n.toLowerCase().replace("\r", ""))
+    );
+  };
+
+  const initModel = async (): Promise<void> => {
+    markov.generate_markov(trainData, +input.window);
+  };
+
+  useEffect(() => {
+    getTrainData(input.source);
+  }, [input.source]);
+
+  useEffect(() => {
+    initModel();
+  }, [trainData, input]);
+
   return (
     <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+      <h1 className={styles.title}>Generador de Nombres de Ciudades</h1>
+      <div className={styles.predictor}>
+        <section className={styles.inputs}></section>
+        <Button onClick={handleNameCreation}>+</Button>
+        <div ref={predictionsRef} className={styles.predictionsWrapper}>
+          {predictions.map((prediction) => (
+            <p
+              key={prediction.id}
+              className={styles.prediction}
+              data-tooltip={`Word: ${prediction.value}\nWindow: ${prediction.window}`}
+              style={{
+                backgroundColor: windowToColor[prediction.window],
+              }}
+            >
+              {prediction.value}
+            </p>
+          ))}
         </div>
       </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+      <ToggleCard title={"Ajustes"}>
+        <RangeInput
+          name="window"
+          min="1"
+          max="6"
+          value={input.window}
+          label="Window"
+          setValue={handleInputChange}
         />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+        <RangeInput
+          name="minLength"
+          min="1"
+          max={`${input.maxLength}`}
+          value={input.minLength}
+          label="Min. Length"
+          setValue={handleInputChange}
+        />
+        <RangeInput
+          name="maxLength"
+          min={`${input.minLength}`}
+          max="24"
+          value={input.maxLength}
+          label="Max. Length"
+          setValue={handleInputChange}
+        />
+        <SelectInput
+          label="Source"
+          name="source"
+          value={input.source}
+          setValue={handleInputChange}
+          options={[
+            { name: "Spanish Towns", value: "/data/spain.txt" },
+            { name: "Tolkien Locations", value: "/data/tolkien.txt" },
+          ]}
+        />
+      </ToggleCard>
     </main>
   );
 }

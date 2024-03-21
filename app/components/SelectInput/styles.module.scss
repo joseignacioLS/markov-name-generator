@@ -1,0 +1,23 @@
+@import "../../styles/variables";
+
+.wrapper {
+  padding: 0.5rem 1rem;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  .select {
+    padding: 0;
+    margin: 0;
+    background-color: transparent;
+    outline: 0;
+    border: 0;
+    color: $color_text;
+
+    option {
+      color: $color_background;
+    }
+  }
+}
