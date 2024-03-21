@@ -11,7 +11,7 @@ import Button from "./components/Button/Button";
 
 const markov = new Markov();
 
-export const windowToColor: { [key: number]: string } = {
+const windowToColor: { [key: number]: string } = {
   1: "#001C47", // Substituted for background color
   2: "#193559",
   3: "#32416C",
