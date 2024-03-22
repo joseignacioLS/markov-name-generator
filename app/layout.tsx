@@ -5,6 +5,8 @@ import Modal from "./components/Modal/Modal";
 import Toast from "./components/Toast/Toast";
 import { ModalProvider } from "./context/modal.context";
 import { ToastProvider } from "./context/toast.context";
+import { FavoritesProvider } from "./context/favorites.contexts";
+import Nav from "./components/Nav/Nav";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,12 +22,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        />
+      </head>
       <body className={inter.className}>
         <ToastProvider>
           <ModalProvider>
-            {children}
-            <Modal />
-            <Toast />
+            <FavoritesProvider>
+              <Nav />
+              {children}
+              <Modal />
+              <Toast />
+            </FavoritesProvider>
           </ModalProvider>
         </ToastProvider>
       </body>

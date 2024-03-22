@@ -1,0 +1,23 @@
+@import "../../styles/variables";
+
+.nav {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+  font-size: 1.25rem;
+
+  span {
+
+    transition: .2s;
+
+    &:hover {
+
+      color: $color_highlight;
+      scale: 1.2;
+    }
+  }
+}

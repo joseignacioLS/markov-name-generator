@@ -1,0 +1,36 @@
+@import "../../styles/variables";
+
+.prediction {
+  scroll-snap-align: start;
+  padding: 1rem 2rem;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  width: 100%;
+
+  border-radius: 1000px;
+
+  span {
+    font-size: 6vw;
+    font-weight: bold;
+    text-transform: capitalize;
+    text-align: center;
+  }
+
+  .favButton {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translate(-50%, 50%);
+
+    span {
+      color: $color_toast;
+
+      &.fav {
+        color: $color_error;
+      }
+    }
+  }
+}

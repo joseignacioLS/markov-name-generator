@@ -1,9 +1,9 @@
-import React, { ReactNode } from "react";
+import React, { MouseEvent, ReactNode } from "react";
 import styles from "./styles.module.scss";
 
 interface IProps {
   children: ReactNode;
-  onClick: () => void;
+  onClick: (e: MouseEvent<HTMLElement>) => void;
   disabled?: boolean;
   size?: string;
 }

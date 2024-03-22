@@ -9,13 +9,13 @@ export class Markov {
     this.data = {};
   }
 
-  private init_values(): void {
+  private initValues(): void {
     this.window = 1;
     this.starters = [];
     this.data = {};
   }
 
-  private process_word(raw_name: string): void {
+  private processWord(raw_name: string): void {
     const chars = Array.from(raw_name);
     if (raw_name.length <= this.window) {
       return;
@@ -42,37 +42,37 @@ export class Markov {
     }
   }
 
-  async generate_markov(words: string[], window: number): Promise<boolean> {
+  async generateMarkov(words: string[], window: number): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.init_values();
+      this.initValues();
       this.window = window;
 
       for (const name of words) {
-        this.process_word(name);
+        this.processWord(name);
       }
 
-      this.adjust_probs();
+      this.adjustProbs();
       resolve(true);
     });
   }
 
-  private adjust_probs(): void {
+  private adjustProbs(): void {
     for (const key in this.data) {
       const total = Object.keys(this.data[key]).reduce((acc, subkey) => acc + this.data[key][subkey], 0);
       Object.keys(this.data[key]).forEach((subkey) => this.data[key][subkey] /= total);
     }
   }
 
-  private init_prediction(): string {
+  private initPrediction(): string {
     return this.starters[Math.floor(Math.random() * this.starters.length)];
   }
 
-  private get_prediction_window(prediction: string, window: number): string {
+  private getPredictionWindow(prediction: string, window: number): string {
     return prediction.slice(-window);
   }
 
-  private grow_prediction(prediction: string): string {
-    const base_prediction = this.get_prediction_window(prediction, this.window);
+  private growPrediction(prediction: string): string {
+    const base_prediction = this.getPredictionWindow(prediction, this.window);
     const options = this.data[base_prediction];
 
     const n = Math.random();
@@ -90,19 +90,19 @@ export class Markov {
   }
 
   predict(min_length: number = 6, max_length: number = 10): string {
-    let prediction = this.init_prediction();
+    let prediction = this.initPrediction();
     let safe = 1000;
     while (safe > 0) {
       safe--;
-      prediction = this.grow_prediction(prediction);
+      prediction = this.growPrediction(prediction);
       if (prediction.length > max_length + 1) {
-        prediction = this.init_prediction();
+        prediction = this.initPrediction();
       }
-      if (prediction.slice(-1) === ".") {
+      if (prediction.at(-1) === ".") {
         if (prediction.length >= min_length) {
           break;
         } else {
-          prediction = this.init_prediction();
+          prediction = this.initPrediction();
         }
       }
     }
