@@ -1,15 +1,15 @@
 @import "../../styles/variables";
 
 .button {
-  font-size: 10vw;
-  aspect-ratio: 1 / 1;
-  width: fit-content;
-  padding: 4vw;
   border-radius: 1000px;
   text-transform: uppercase;
   border: 0;
   outline: 0;
   background-color: $color_primary;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
 
   &:active {
     color: $color_primary;
@@ -20,16 +20,41 @@
     opacity: 0.5;
     animation: spin 1s infinite ease;
   }
+
+  width: 75px;
+  height: 75px;
+  font-size: 68px;
+
+  &.big {
+    width: 150px;
+    height: 150px;
+    font-size: 124px;
+
+  }
+
+  &.small {
+    width: 36px;
+    height: 36px;
+    font-size: 24px;
+  }
+
+  &.verysmall {
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+  }
 }
 
 @keyframes spin {
   0% {
     rotate: -30deg;
   }
+
   50% {
     rotate: 30deg;
   }
-  100%{
+
+  100% {
     rotate: -30deg;
   }
 }

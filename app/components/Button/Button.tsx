@@ -5,11 +5,18 @@ interface IProps {
   children: ReactNode;
   onClick: () => void;
   disabled?: boolean;
+  size?: string;
 }
 
-const Button = ({ children, onClick, disabled = false }: IProps) => {
+const Button = ({ children, onClick, disabled = false, size = "" }: IProps) => {
   return (
-    <button className={styles.button} onClick={onClick} disabled={disabled}>
+    <button
+      className={`${styles.button} ${size === "big" && styles.big} ${
+        size === "small" && styles.small
+      } ${size === "verysmall" && styles.verysmall}`}
+      onClick={onClick}
+      disabled={disabled}
+    >
       {children}
     </button>
   );

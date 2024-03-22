@@ -1,0 +1,57 @@
+@import "../../styles/variables";
+
+.wrapper {
+  z-index: 1000;
+  position: fixed;
+  top: .5rem;
+  right: .5rem;
+  width: fit-content;
+  max-width: 150px;
+  display: flex;
+  flex-direction: column;
+
+  .toast {
+    width: fit-content;
+    height: 0;
+    background-color: $color_toast;
+    padding: 0 1rem;
+    border-radius: .5rem;
+    animation: appear .5s forwards;
+    overflow: hidden;
+    margin-bottom: 0;
+
+    &.expired {
+      animation: disappear .5s forwards;
+    }
+
+    &.wrn {
+      background-color: $color_warning;
+    }
+
+    &.err {
+      background-color: $color_error;
+    }
+  }
+}
+
+@keyframes appear {
+  to {
+    padding: .5rem 1rem;
+    height: fit-content;
+    margin-bottom: .5rem;
+  }
+}
+
+@keyframes disappear {
+  from {
+    padding: .5rem 1rem;
+    height: fit-content;
+    margin-bottom: .5rem;
+  }
+
+  to {
+    height: 0;
+    padding: 0 1rem;
+    margin-bottom: 0;
+  }
+}

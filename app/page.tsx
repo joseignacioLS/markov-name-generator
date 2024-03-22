@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
 import styles from "./page.module.scss";
 import { Markov } from "./utils/markov";
 import RangeInput from "./components/RangeInput/RangeInput";
@@ -8,6 +8,11 @@ import { generateId } from "./utils/other";
 import ToggleCard from "./components/ToggleCard/ToggleCard";
 import SelectInput from "./components/SelectInput/SelectInput";
 import Button from "./components/Button/Button";
+import { sources } from "./utils/dataSources";
+import { modalContext } from "./context/modal.context";
+import { IPrediction } from "./types";
+import PredictionDetail from "./components/PredictionDetail/PredictionDetail";
+import { toastContext } from "./context/toast.context";
 
 const markov = new Markov();
 
@@ -19,13 +24,6 @@ const windowToColor: { [key: number]: string } = {
   5: "#647992",
   6: "#7D95A5", // Substituted for highlight color
 };
-
-interface IPrediction {
-  id: number;
-  value: string;
-  length: number;
-  window: number;
-}
 
 export default function Home() {
   const [markovTraining, setMarkovTraining] = useState(false);
@@ -42,6 +40,9 @@ export default function Home() {
     maxLength: "12",
     source: "/data/spain.txt",
   });
+
+  const { showModal } = useContext(modalContext);
+  const { addToast } = useContext(toastContext);
 
   const predictionsRef = useRef(null);
 
@@ -62,9 +63,21 @@ export default function Home() {
   };
 
   const handleNameCreation = (): void => {
-    if (!markov) return;
+    if (!markov) {
+      addToast(
+        "El modelo no se ha cargado correctamente. Refresca la página",
+        "err"
+      );
+      return;
+    }
     const newName: string = markov.predict(+input.minLength, +input.maxLength);
-    if (newName === "") return;
+    if (newName === "") {
+      addToast(
+        "Ha habido un problema con la generación. Vuelve a intentarlo",
+        "wrn"
+      );
+      return;
+    }
     setPredictions((oldState) => {
       return [
         {
@@ -72,6 +85,7 @@ export default function Home() {
           value: newName,
           length: newName.length,
           window: +input.window,
+          source: sources.find((s) => s.value === input.source)?.name || "",
         },
         ...oldState.slice(0, 25),
       ];
@@ -105,10 +119,14 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
-      <h1 className={styles.title}>Generador de Nombres de Ciudades</h1>
+      <h1 className={styles.title}>Generador de Nombres</h1>
       <div className={styles.predictor}>
         <section className={styles.inputs}></section>
-        <Button onClick={handleNameCreation} disabled={markovTraining}>
+        <Button
+          onClick={handleNameCreation}
+          disabled={markovTraining}
+          size="big"
+        >
           +
         </Button>
         <div ref={predictionsRef} className={styles.predictionsWrapper}>
@@ -116,6 +134,9 @@ export default function Home() {
             <p
               key={prediction.id}
               className={styles.prediction}
+              onClick={() => {
+                showModal(<PredictionDetail prediction={prediction} />);
+              }}
               data-tooltip={`Word: ${prediction.value}\nWindow: ${prediction.window}`}
               style={{
                 backgroundColor: windowToColor[prediction.window],
@@ -132,7 +153,7 @@ export default function Home() {
           min="1"
           max="6"
           value={input.window}
-          label="Window"
+          label="Fidelidad"
           setValue={handleInputChange}
         />
         <RangeInput
@@ -140,7 +161,7 @@ export default function Home() {
           min="1"
           max={`${input.maxLength}`}
           value={input.minLength}
-          label="Min. Length"
+          label="Mínima Longitud"
           setValue={handleInputChange}
         />
         <RangeInput
@@ -148,18 +169,15 @@ export default function Home() {
           min={`${input.minLength}`}
           max="24"
           value={input.maxLength}
-          label="Max. Length"
+          label="Máxima Longitud"
           setValue={handleInputChange}
         />
         <SelectInput
-          label="Source"
+          label="Dataset"
           name="source"
           value={input.source}
           setValue={handleInputChange}
-          options={[
-            { name: "Spanish Towns", value: "/data/spain.txt" },
-            { name: "Tolkien Locations", value: "/data/tolkien.txt" },
-          ]}
+          options={sources}
         />
       </ToggleCard>
     </main>

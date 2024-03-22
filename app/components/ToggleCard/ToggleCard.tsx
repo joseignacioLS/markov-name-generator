@@ -12,6 +12,7 @@ const ToggleCard = ({ title = "", children }: IProps) => {
   const toggleShow = () => setShow((v) => !v);
   return (
     <div className={`${styles.wrapper} ${show && styles.show}`}>
+      <div className={styles.closer} onClick={() => setShow(false)}></div>
       <div className={styles.topBar} onClick={toggleShow}>
         <span>{title}</span>
       </div>
