@@ -32,9 +32,6 @@ const Home = () => {
     <main className={styles.main}>
       <h1 className={styles.title}>Favoritos</h1>
       <div className={styles.predictor}>
-        <div>
-          <h2>Nombres guardados</h2>
-        </div>
         <div className={styles.predictionsWrapper}>
           {favorites
             .filter((prediction) => {

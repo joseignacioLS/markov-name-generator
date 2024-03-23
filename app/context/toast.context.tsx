@@ -47,14 +47,14 @@ export const ToastProvider = ({ children }: IProps) => {
     const id = generateId();
     setMessages((oldState) => {
       return [
-        { id, message, type: type || EToastType.MSG, expired: false },
         ...oldState.filter((v) => !v.expired),
+        { id, message, type: type || EToastType.MSG, expired: false },
       ];
     });
 
     setTimeout(() => {
       removeToast(id);
-    }, 2000);
+    }, 4000);
   };
   return (
     <toastContext.Provider value={{ messages, addToast }}>

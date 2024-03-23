@@ -29,7 +29,7 @@ export default function Home() {
     window: "3",
     minLength: "6",
     maxLength: "12",
-    source: "/data/spain.txt",
+    source: sources[0].value,
   });
 
   const { addToast } = useContext(toastContext);
@@ -85,21 +85,31 @@ export default function Home() {
     resetPredictionsScroll();
   };
 
-  const getTrainData = async (source = "/data/spain.txt"): Promise<void> => {
+  const getTrainData = async (source: string): Promise<void> => {
     const response = (await getRequest(source)) as string;
     if (response === "") {
       addToast("Ha habido un error cargando el set de datos", EToastType.ERR);
       return;
     }
-    setTrainData(
-      response.split("\n").map((n: string) => n.toLowerCase().replace("\r", ""))
+    addToast(
+      `Datos de "${
+        sources.find((s) => s.value === source)?.name
+      }" cargados con éxito`,
+      EToastType.MSG
     );
+    const formattedData = response
+      .split("\n")
+      .map((n: string) => n.toLowerCase().replace("\r", ""));
+    setTrainData(formattedData);
   };
 
   const initModel = async (): Promise<void> => {
+    if (trainData.length === 0) return;
     setMarkovTraining(true);
     markov.generateMarkov(trainData, +input.window).then(() => {
       setMarkovTraining(false);
+
+      addToast(`Modelo de predición generado con éxito`, EToastType.MSG);
     });
   };
 
@@ -109,12 +119,16 @@ export default function Home() {
 
   useEffect(() => {
     initModel();
-  }, [trainData, input]);
+  }, [trainData, input.window, input.maxLength, input.minLength]);
 
   return (
     <main className={styles.main}>
       <h1 className={styles.title}>Generador de Nombres</h1>
       <div className={styles.predictor}>
+        <h2>
+          Generando nombres para{" "}
+          {sources.find((s) => s.value === input.source)?.name}
+        </h2>
         <Button
           onClick={handleNameCreation}
           disabled={markovTraining || !markov}

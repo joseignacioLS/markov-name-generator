@@ -7,7 +7,6 @@ import { routes } from "@/app/routes/routes";
 
 const Nav = () => {
   const pathname = usePathname();
-  console.log({ pathname });
   return (
     <nav className={styles.nav}>
       {routes

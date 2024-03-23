@@ -20,12 +20,18 @@
   padding: 2rem 10vw;
   position: relative;
 
-  display: grid;
-  grid-template-rows: auto 1fr;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 1rem;
-  justify-items: center;
+
+  >* {
+    flex-shrink: 0;
+  }
 
   .predictionsWrapper {
+    flex-shrink: 1;
+    padding-bottom: 3rem;
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
