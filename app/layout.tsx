@@ -3,10 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.scss";
 import Modal from "./components/Modal/Modal";
 import Toast from "./components/Toast/Toast";
-import { ModalProvider } from "./context/modal.context";
-import { ToastProvider } from "./context/toast.context";
-import { FavoritesProvider } from "./context/favorites.contexts";
 import Nav from "./components/Nav/Nav";
+import ContextProvider from "./context/ContextProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,16 +27,12 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className}>
-        <ToastProvider>
-          <ModalProvider>
-            <FavoritesProvider>
-              <Nav />
-              {children}
-              <Modal />
-              <Toast />
-            </FavoritesProvider>
-          </ModalProvider>
-        </ToastProvider>
+        <ContextProvider>
+          <Nav />
+          {children}
+          <Modal />
+          <Toast />
+        </ContextProvider>
       </body>
     </html>
   );

@@ -1,4 +1,4 @@
-export const store = (key: string, value: any) => {
+export const store = (key: string, value: any): void => {
   if (typeof value === "object") {
     localStorage.setItem(key, JSON.stringify(value))
   }
@@ -7,7 +7,7 @@ export const store = (key: string, value: any) => {
   }
 }
 
-export const recover = (key: string) => {
+export const recover = (key: string): any => {
   const recovered = localStorage.getItem(key);
   if (!recovered) return undefined
   if (recovered[0] === "{" && recovered.at(-1) === "}") {

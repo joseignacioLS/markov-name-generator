@@ -3,17 +3,7 @@
 import Link from "next/link";
 import styles from "./styles.module.scss";
 import { usePathname } from "next/navigation";
-
-const routes = [
-  {
-    icon: "home",
-    path: "/",
-  },
-  {
-    icon: "star",
-    path: "/favs",
-  },
-];
+import { routes } from "@/app/routes/routes";
 
 const Nav = () => {
   const pathname = usePathname();

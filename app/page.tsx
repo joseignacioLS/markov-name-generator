@@ -10,7 +10,7 @@ import SelectInput from "./components/SelectInput/SelectInput";
 import Button from "./components/Button/Button";
 import { sources } from "./utils/dataSources";
 import { IPrediction } from "./types";
-import { toastContext } from "./context/toast.context";
+import { EToastType, toastContext } from "./context/toast.context";
 import { getRequest } from "./services/request.service";
 import PredictionCard from "./components/PredictionCard/PredictionCard";
 
@@ -58,7 +58,7 @@ export default function Home() {
     if (!markov) {
       addToast(
         "El modelo no se ha cargado correctamente. Refresca la página",
-        "err"
+        EToastType.ERR
       );
       return;
     }
@@ -66,7 +66,7 @@ export default function Home() {
     if (newName === "") {
       addToast(
         "Ha habido un problema con la generación. Vuelve a intentarlo",
-        "wrn"
+        EToastType.WRN
       );
       return;
     }
@@ -88,7 +88,7 @@ export default function Home() {
   const getTrainData = async (source = "/data/spain.txt"): Promise<void> => {
     const response = (await getRequest(source)) as string;
     if (response === "") {
-      addToast("Ha habido un error cargando el set de datos", "err");
+      addToast("Ha habido un error cargando el set de datos", EToastType.ERR);
       return;
     }
     setTrainData(

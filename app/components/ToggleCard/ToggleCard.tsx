@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from "react";
+import { ReactNode, useState } from "react";
 import styles from "./styles.module.scss";
 
 interface IProps {

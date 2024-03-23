@@ -1,20 +1,12 @@
 import { IPrediction } from "@/app/types";
-import React, { MouseEvent, useContext } from "react";
+import { MouseEvent, useContext } from "react";
 import PredictionDetail from "../PredictionDetail/PredictionDetail";
 import { modalContext } from "@/app/context/modal.context";
 
 import styles from "./styles.module.scss";
 import Button from "../Button/Button";
 import { favoritesContext } from "@/app/context/favorites.contexts";
-
-const windowToColor: { [key: number]: string } = {
-  1: "#001C47", // Substituted for background color
-  2: "#193559",
-  3: "#32416C",
-  4: "#4B5D7F",
-  5: "#647992",
-  6: "#7D95A5", // Substituted for highlight color
-};
+import { windowToColor } from "@/app/utils/other";
 
 interface IProps {
   prediction: IPrediction;
@@ -38,7 +30,6 @@ const PredictionCard = ({ prediction }: IProps) => {
       key={prediction.id}
       className={styles.prediction}
       onClick={handleShowDetail}
-      data-tooltip={`Word: ${prediction.value}\nWindow: ${prediction.window}`}
       style={{
         backgroundColor: windowToColor[prediction.window],
       }}

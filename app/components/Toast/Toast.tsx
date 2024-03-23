@@ -1,8 +1,14 @@
 "use client";
 
 import { useContext } from "react";
-import { toastContext } from "../../context/toast.context";
+import { toastContext, IToast, EToastType } from "../../context/toast.context";
 import styles from "./styles.module.scss";
+
+const classNameByType: { [key in IToast["type"]]: string } = {
+  [EToastType.MSG]: "",
+  [EToastType.WRN]: styles.wrn,
+  [EToastType.ERR]: styles.err,
+};
 
 const Toast = () => {
   const { messages } = useContext(toastContext);
@@ -13,8 +19,8 @@ const Toast = () => {
           <p
             key={m.id}
             className={`${styles.toast} ${m.expired && styles.expired} ${
-              m.type === "wrn" && styles.wrn
-            } ${m.type === "err" && styles.err}`}
+              classNameByType[m.type]
+            }`}
           >
             {m.message}
           </p>

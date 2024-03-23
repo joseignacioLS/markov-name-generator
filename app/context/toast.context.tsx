@@ -3,10 +3,16 @@
 import { createContext, ReactNode, useState } from "react";
 import { generateId } from "../utils/other";
 
+export enum EToastType {
+  MSG,
+  WRN,
+  ERR,
+}
+
 export interface IToast {
   id: number;
   message: string;
-  type: "msg" | "wrn" | "err";
+  type: EToastType;
   expired: boolean;
 }
 
@@ -41,7 +47,7 @@ export const ToastProvider = ({ children }: IProps) => {
     const id = generateId();
     setMessages((oldState) => {
       return [
-        { id, message, type: type || "msg", expired: false },
+        { id, message, type: type || EToastType.MSG, expired: false },
         ...oldState.filter((v) => !v.expired),
       ];
     });
