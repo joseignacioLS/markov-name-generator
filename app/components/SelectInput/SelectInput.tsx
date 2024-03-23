@@ -12,7 +12,7 @@ interface IProps {
 const SelectInput = ({ options, name, value, label, setValue }: IProps) => {
   return (
     <div className={styles.wrapper}>
-      <span>{label}</span>
+      {label && <span>{label}</span>}
       <select
         className={styles.select}
         name={name}
