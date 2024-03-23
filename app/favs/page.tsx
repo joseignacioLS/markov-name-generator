@@ -32,7 +32,7 @@ const Home = () => {
       <section className={styles.titles}>
         <h1 className={styles.title}>Favoritos</h1>
       </section>
-      <div className={styles.predictor}>
+      <div className={styles.predictionWrapper}>
         {favorites
           .filter((prediction) => {
             const sourceFilter =

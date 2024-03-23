@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, UIEvent, useContext } from "react";
+import { ChangeEvent, UIEvent, useContext, useEffect } from "react";
 import styles from "./page.module.scss";
 import ToggleCard from "./components/ToggleCard/ToggleCard";
 import { sources } from "./utils/dataSources";
@@ -38,6 +38,10 @@ export default function Home() {
     }
   };
 
+  useEffect(() => {
+    document.querySelector("#predictionWrapper")?.scrollTo({ top: 0 });
+  }, [predictions[0]]);
+
   return (
     <main>
       <section className={styles.titles}>
@@ -48,7 +52,7 @@ export default function Home() {
       <div
         id="predictionWrapper"
         onScroll={handleScroll}
-        className={styles.predictor}
+        className={styles.predictionWrapper}
       >
         {predictions.map((prediction) => (
           <PredictionCard key={prediction.id} prediction={prediction} />

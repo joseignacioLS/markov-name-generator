@@ -6,11 +6,11 @@
   background-color: rgba(black, .25);
 }
 
-.predictor {
+.predictionWrapper {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  padding: 2rem 10vw 5rem 10vw;
+  padding: 1rem 10vw 5rem 10vw;
   position: relative;
 
   display: flex;
@@ -19,6 +19,8 @@
   gap: 1.5rem;
 
   overflow: auto;
+
+  scroll-behavior: smooth;
 
 
   -ms-overflow-style: none;
