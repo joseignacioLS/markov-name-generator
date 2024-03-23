@@ -3,6 +3,7 @@
 import {
   createContext,
   ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -18,8 +19,6 @@ interface IValue {
   config: any;
   setConfig: any;
   predictions: IPrediction[];
-  getTrainData: (source: string) => Promise<void>;
-  initModel: (config: any) => Promise<void>;
   handleNameCreation: () => void;
 }
 
@@ -27,8 +26,6 @@ export const predictorContext = createContext<IValue>({
   config: {},
   setConfig: () => {},
   predictions: [],
-  getTrainData: (source: string) => new Promise((resolve) => resolve()),
-  initModel: (config: any) => new Promise((resolve) => resolve()),
   handleNameCreation: () => {},
 });
 
@@ -53,7 +50,7 @@ export const PredictorProvider = ({ children }: IProps) => {
 
   const { addToast } = useContext(toastContext);
 
-  const handleNameCreation = (): void => {
+  const handleNameCreation = useCallback((): void => {
     if (!predictor) {
       addToast(
         "El modelo no se ha cargado correctamente. Refresca la página",
@@ -85,53 +82,57 @@ export const PredictorProvider = ({ children }: IProps) => {
         },
       ];
     });
-  };
-
-  const getTrainData = async (source: string): Promise<void> => {
-    const response = (await getRequest(source)) as string;
-    if (response === "") {
-      addToast("Ha habido un error cargando el set de datos", EToastType.ERR);
-      return;
-    }
-    addToast(
-      `Datos de "${
-        sources.find((s) => s.value === source)?.name
-      }" cargados con éxito`,
-      EToastType.MSG
-    );
-    const formattedData = response
-      .split("\n")
-      .map((n: string) => n.toLowerCase().replace("\r", ""));
-    setTrainData(formattedData);
-  };
-
-  const initModel = async (config: any): Promise<void> => {
-    if (trainData.length === 0 || !predictor) return;
-    setPredictions([]);
-    predictor.generateMarkov(trainData, +config.window).then(() => {
-      addToast(`Modelo de predición generado con éxito`, EToastType.MSG);
-
-      for (let i = 0; i < 10; i++) {
-        handleNameCreation();
-      }
-    });
-  };
+  }, [predictor, config, setPredictions]);
+  
 
   useEffect(() => {
+    const getTrainData = async (source: string): Promise<void> => {
+      const response = (await getRequest(source)) as string;
+      if (response === "") {
+        addToast("Ha habido un error cargando el set de datos", EToastType.ERR);
+        return;
+      }
+      addToast(
+        `Datos de "${
+          sources.find((s) => s.value === source)?.name
+        }" cargados con éxito`,
+        EToastType.MSG
+      );
+      const formattedData = response
+        .split("\n")
+        .map((n: string) => n.toLowerCase().replace("\r", ""));
+      setTrainData(formattedData);
+    };
     getTrainData(config.source);
   }, [config.source]);
 
   useEffect(() => {
-    initModel(config);
-  }, [trainData, config.window, config.maxLength, config.minLength]);
+    const initModel = async (): Promise<void> => {
+      if (trainData.length === 0 || !predictor) return;
+      setPredictions([]);
+      predictor.generateMarkov(trainData, +config.window).then(() => {
+        addToast(`Modelo de predición generado con éxito`, EToastType.MSG);
+
+        for (let i = 0; i < 10; i++) {
+          handleNameCreation();
+        }
+      });
+    };
+    initModel();
+  }, [
+    trainData,
+    config.window,
+    config.maxLength,
+    config.minLength,
+    handleNameCreation,
+    predictor,
+  ]);
 
   return (
     <predictorContext.Provider
       value={{
         predictions,
         handleNameCreation,
-        getTrainData,
-        initModel,
         config,
         setConfig,
       }}

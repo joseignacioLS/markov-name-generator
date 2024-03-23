@@ -37,10 +37,10 @@ export default function Home() {
       }
     }
   };
-
+  const firstPredictionId = predictions[0]?.id;
   useEffect(() => {
     document.querySelector("#predictionWrapper")?.scrollTo({ top: 0 });
-  }, [predictions[0]]);
+  }, [firstPredictionId]);
 
   return (
     <main>
