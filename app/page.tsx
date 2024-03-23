@@ -1,22 +1,21 @@
 "use client";
 
-import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
+import { ChangeEvent, UIEvent, useContext, useEffect, useState } from "react";
 import styles from "./page.module.scss";
 import { Markov } from "./utils/markov";
 import { generateId } from "./utils/other";
 import ToggleCard from "./components/ToggleCard/ToggleCard";
-import Button from "./components/Button/Button";
 import { sources } from "./utils/dataSources";
 import { EPredictor, IPrediction } from "./types";
 import { EToastType, toastContext } from "./context/toast.context";
 import { getRequest } from "./services/request.service";
 import PredictionCard from "./components/PredictionCard/PredictionCard";
 import MarkovInputs from "./components/MarkovInputs/MarkovInputs";
+import SelectInput from "./components/SelectInput/SelectInput";
 
 const markov = new Markov();
 
 export default function Home() {
-  const [markovTraining, setMarkovTraining] = useState(false);
   const [trainData, setTrainData] = useState<string[]>([]);
   const [predictions, setPredictions] = useState<IPrediction[]>([]);
   const [input, setInput] = useState<{
@@ -32,16 +31,6 @@ export default function Home() {
   });
 
   const { addToast } = useContext(toastContext);
-
-  const predictionsRef = useRef(null);
-
-  const resetPredictionsScroll = () => {
-    if (!predictionsRef?.current) return;
-    const element = predictionsRef.current as any;
-    setTimeout(() => {
-      element.scrollTo({ top: 0 });
-    }, 0);
-  };
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
@@ -71,6 +60,7 @@ export default function Home() {
     }
     setPredictions((oldState) => {
       return [
+        ...oldState,
         {
           id: generateId(),
           value: newName,
@@ -79,10 +69,8 @@ export default function Home() {
           window: +input.window,
           source: sources.find((s) => s.value === input.source)?.name || "",
         },
-        ...oldState.slice(0, 25),
       ];
     });
-    resetPredictionsScroll();
   };
 
   const getTrainData = async (source: string): Promise<void> => {
@@ -105,12 +93,24 @@ export default function Home() {
 
   const initModel = async (): Promise<void> => {
     if (trainData.length === 0) return;
-    setMarkovTraining(true);
+    setPredictions([]);
     markov.generateMarkov(trainData, +input.window).then(() => {
-      setMarkovTraining(false);
-
       addToast(`Modelo de predición generado con éxito`, EToastType.MSG);
+
+      for (let i = 0; i < 10; i++) {
+        handleNameCreation();
+      }
     });
+  };
+
+  const handleScroll = (e: UIEvent<HTMLElement>) => {
+    const { scrollTop, scrollHeight, offsetHeight } = e.currentTarget;
+
+    if (scrollHeight - scrollTop <= offsetHeight) {
+      for (let i = 0; i < 4; i++) {
+        handleNameCreation();
+      }
+    }
   };
 
   useEffect(() => {
@@ -118,36 +118,49 @@ export default function Home() {
   }, [input.source]);
 
   useEffect(() => {
+    setPredictions([]);
     initModel();
   }, [trainData, input.window, input.maxLength, input.minLength]);
 
   return (
     <main className={styles.main}>
       <h1 className={styles.title}>Generador de Nombres</h1>
-      <div className={styles.predictor}>
-        <h2>
-          Generando nombres para{" "}
-          {sources.find((s) => s.value === input.source)?.name}
-        </h2>
-        <Button
-          onClick={handleNameCreation}
-          disabled={markovTraining || !markov}
-          size="big"
-        >
-          <span className={"material-symbols-outlined"}>add</span>
-        </Button>
-        <div ref={predictionsRef} className={styles.predictionsWrapper}>
-          {predictions.map((prediction) => (
-            <PredictionCard key={prediction.id} prediction={prediction} />
-          ))}
-        </div>
+      <div
+        id="predictionWrapper"
+        onScroll={handleScroll}
+        className={styles.predictor}
+      >
+        {predictions.map((prediction) => (
+          <PredictionCard key={prediction.id} prediction={prediction} />
+        ))}
       </div>
       <ToggleCard title={"Ajustes"}>
-        <MarkovInputs
-          input={input}
-          handleInputChange={handleInputChange}
-          selectOptions={sources}
-        />
+        <div
+          style={{
+            padding: "1rem",
+            display: "flex",
+            gap: "1rem",
+            flexDirection: "column",
+          }}
+        >
+          <SelectInput
+            name="predictor"
+            label="Predictor"
+            value={"markov"}
+            setValue={(e) => {}}
+            options={[
+              {
+                name: "markov",
+                value: "markov",
+              },
+            ]}
+          />
+          <MarkovInputs
+            input={input}
+            handleInputChange={handleInputChange}
+            selectOptions={sources}
+          />
+        </div>
       </ToggleCard>
     </main>
   );
