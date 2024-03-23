@@ -3,16 +3,15 @@
 import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
 import styles from "./page.module.scss";
 import { Markov } from "./utils/markov";
-import RangeInput from "./components/RangeInput/RangeInput";
 import { generateId } from "./utils/other";
 import ToggleCard from "./components/ToggleCard/ToggleCard";
-import SelectInput from "./components/SelectInput/SelectInput";
 import Button from "./components/Button/Button";
 import { sources } from "./utils/dataSources";
-import { IPrediction } from "./types";
+import { EPredictor, IPrediction } from "./types";
 import { EToastType, toastContext } from "./context/toast.context";
 import { getRequest } from "./services/request.service";
 import PredictionCard from "./components/PredictionCard/PredictionCard";
+import MarkovInputs from "./components/MarkovInputs/MarkovInputs";
 
 const markov = new Markov();
 
@@ -75,6 +74,7 @@ export default function Home() {
         {
           id: generateId(),
           value: newName,
+          method: EPredictor.MARKOV,
           length: newName.length,
           window: +input.window,
           source: sources.find((s) => s.value === input.source)?.name || "",
@@ -143,39 +143,11 @@ export default function Home() {
         </div>
       </div>
       <ToggleCard title={"Ajustes"}>
-        <div className={styles.inputWrapper}>
-          <RangeInput
-            name="window"
-            min="1"
-            max="6"
-            value={input.window}
-            label="Fidelidad"
-            setValue={handleInputChange}
-          />
-          <RangeInput
-            name="minLength"
-            min="1"
-            max={`${input.maxLength}`}
-            value={input.minLength}
-            label="Mínima Longitud"
-            setValue={handleInputChange}
-          />
-          <RangeInput
-            name="maxLength"
-            min={`${input.minLength}`}
-            max="24"
-            value={input.maxLength}
-            label="Máxima Longitud"
-            setValue={handleInputChange}
-          />
-          <SelectInput
-            label="Dataset"
-            name="source"
-            value={input.source}
-            setValue={handleInputChange}
-            options={sources}
-          />
-        </div>
+        <MarkovInputs
+          input={input}
+          handleInputChange={handleInputChange}
+          selectOptions={sources}
+        />
       </ToggleCard>
     </main>
   );

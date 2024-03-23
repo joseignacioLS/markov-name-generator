@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, ReactNode, useEffect, useState } from "react";
-import { IPrediction } from "../types";
+import { EPredictor, IPrediction } from "../types";
 import { recover, store } from "../services/localstorage.service";
 
 interface IValue {
@@ -53,7 +53,11 @@ export const FavoritesProvider = ({ children }: IProps) => {
   useEffect(() => {
     const recovered = recover("markov-names");
     if (!recovered?.[0]) return;
-    setFavorites(recovered[0]);
+    setFavorites(
+      recovered[0].map((r: any) =>
+        r.method ? r : { ...r, method: EPredictor.MARKOV }
+      )
+    );
   }, []);
 
   return (
