@@ -19,11 +19,13 @@ export interface IToast {
 interface IValue {
   messages: IToast[];
   addToast: (message: string, type?: IToast["type"]) => void;
+  removeToast: (id: number) => void;
 }
 
 export const toastContext = createContext<IValue>({
   messages: [],
   addToast: (message: string, type?: IToast["type"]) => {},
+  removeToast: (id: number) => {},
 });
 
 interface IProps {
@@ -57,7 +59,7 @@ export const ToastProvider = ({ children }: IProps) => {
     }, 4000);
   };
   return (
-    <toastContext.Provider value={{ messages, addToast }}>
+    <toastContext.Provider value={{ messages, addToast, removeToast }}>
       {children}
     </toastContext.Provider>
   );

@@ -11,7 +11,7 @@ const classNameByType: { [key in IToast["type"]]: string } = {
 };
 
 const Toast = () => {
-  const { messages } = useContext(toastContext);
+  const { messages, removeToast } = useContext(toastContext);
   return (
     <div className={styles.wrapper}>
       {messages.map((m) => {
@@ -21,6 +21,7 @@ const Toast = () => {
             className={`${styles.toast} ${m.expired && styles.expired} ${
               classNameByType[m.type]
             }`}
+            onClick={() => removeToast(m.id)}
           >
             {m.message}
           </p>
