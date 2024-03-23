@@ -1,5 +1,5 @@
 export enum EPredictor {
-  MARKOV
+  MARKOV = "MARKOV"
 }
 
 export interface IPrediction {

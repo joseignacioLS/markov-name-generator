@@ -5,7 +5,7 @@ import { modalContext } from "@/app/context/modal.context";
 
 import styles from "./styles.module.scss";
 import Button from "../Button/Button";
-import { favoritesContext } from "@/app/context/favorites.contexts";
+import { favoritesContext } from "@/app/context/favorites.context";
 import { windowToColor } from "@/app/utils/other";
 
 interface IProps {

@@ -1,0 +1,25 @@
+@import "../../styles/variables";
+
+.spinner {
+  background-color: $color_highlight;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  animation: spin 3s infinite linear;
+
+  span {
+    font-size: 32px;
+    color: $color_background;
+  }
+}
+
+@keyframes spin {
+  to {
+    rotate: 360deg;
+  }
+}

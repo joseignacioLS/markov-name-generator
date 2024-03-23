@@ -3,7 +3,7 @@
 import { ChangeEvent, useContext, useState } from "react";
 import PredictionCard from "../components/PredictionCard/PredictionCard";
 import styles from "../page.module.scss";
-import { favoritesContext } from "../context/favorites.contexts";
+import { favoritesContext } from "../context/favorites.context";
 import { sources } from "../utils/dataSources";
 import ToggleCard from "../components/ToggleCard/ToggleCard";
 import MarkovInputs from "../components/MarkovInputs/MarkovInputs";
