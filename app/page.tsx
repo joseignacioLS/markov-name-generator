@@ -32,9 +32,7 @@ export default function Home() {
     const { scrollTop, scrollHeight, offsetHeight } = e.currentTarget;
 
     if (scrollHeight - scrollTop <= offsetHeight * 1.5) {
-      for (let i = 0; i < 4; i++) {
-        handleNameCreation();
-      }
+      handleNameCreation();
     }
   };
   const firstPredictionId = predictions[0]?.id;

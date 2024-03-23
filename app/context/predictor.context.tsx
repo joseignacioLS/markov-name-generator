@@ -59,6 +59,7 @@ export const PredictorProvider = ({ children }: IProps) => {
       return;
     }
     const newName: string = predictor.predict(
+      +config.window,
       +config.minLength,
       +config.maxLength
     );
@@ -83,7 +84,6 @@ export const PredictorProvider = ({ children }: IProps) => {
       ];
     });
   }, [predictor, config, setPredictions]);
-  
 
   useEffect(() => {
     const getTrainData = async (source: string): Promise<void> => {
@@ -110,7 +110,7 @@ export const PredictorProvider = ({ children }: IProps) => {
     const initModel = async (): Promise<void> => {
       if (trainData.length === 0 || !predictor) return;
       setPredictions([]);
-      predictor.generateMarkov(trainData, +config.window).then(() => {
+      predictor.generateMarkov(trainData).then(() => {
         addToast(`Modelo de predición generado con éxito`, EToastType.MSG);
 
         for (let i = 0; i < 10; i++) {
@@ -119,14 +119,15 @@ export const PredictorProvider = ({ children }: IProps) => {
       });
     };
     initModel();
-  }, [
-    trainData,
-    config.window,
-    config.maxLength,
-    config.minLength,
-    handleNameCreation,
-    predictor,
-  ]);
+  }, [trainData, predictor]);
+
+  useEffect(() => {
+    if (!predictor?.trained) return;
+    setPredictions([]);
+    for (let i = 0; i < 10; i++) {
+      handleNameCreation();
+    }
+  }, [config.window, config.minLength, config.maxLength]);
 
   return (
     <predictorContext.Provider
