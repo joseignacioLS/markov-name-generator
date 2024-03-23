@@ -31,23 +31,21 @@ const Home = () => {
     <main className={styles.main}>
       <h1 className={styles.title}>Favoritos</h1>
       <div className={styles.predictor}>
-        <div className={styles.predictionsWrapper}>
-          {favorites
-            .filter((prediction) => {
-              const sourceFilter =
-                input.source === "" ||
-                sources.find((s) => s.value === input.source)?.name ===
-                  prediction.source;
-              const windowFilter =
-                input.window === "0" || prediction.window === +input.window;
-              const lengthFilter =
-                input.length === "0" || prediction.length === +input.length;
-              return sourceFilter && windowFilter && lengthFilter;
-            })
-            .map((prediction) => (
-              <PredictionCard key={prediction.id} prediction={prediction} />
-            ))}
-        </div>
+        {favorites
+          .filter((prediction) => {
+            const sourceFilter =
+              input.source === "" ||
+              sources.find((s) => s.value === input.source)?.name ===
+                prediction.source;
+            const windowFilter =
+              input.window === "0" || prediction.window === +input.window;
+            const lengthFilter =
+              input.length === "0" || prediction.length === +input.length;
+            return sourceFilter && windowFilter && lengthFilter;
+          })
+          .map((prediction) => (
+            <PredictionCard key={prediction.id} prediction={prediction} />
+          ))}
       </div>
       <ToggleCard title={"Filtros"}>
         <MarkovInputs
