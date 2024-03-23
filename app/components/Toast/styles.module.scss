@@ -20,6 +20,8 @@
     overflow: hidden;
     margin-bottom: 0;
 
+    user-select: none;
+
     &.expired {
       animation: disappear .5s forwards;
     }
