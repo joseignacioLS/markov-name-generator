@@ -48,12 +48,21 @@ const Home = () => {
           ))}
       </div>
       <ToggleCard title={"Filtros"}>
-        <MarkovInputs
-          input={input}
-          handleInputChange={handleInputChange}
-          selectOptions={[{ value: "", name: "Todos" }, ...sources]}
-          mode="filter"
-        />
+        <div
+          style={{
+            padding: "1rem",
+            display: "flex",
+            gap: "1rem",
+            flexDirection: "column",
+          }}
+        >
+          <MarkovInputs
+            input={input}
+            handleInputChange={handleInputChange}
+            selectOptions={[{ value: "", name: "Todos" }, ...sources]}
+            mode="filter"
+          />
+        </div>
       </ToggleCard>
     </main>
   );

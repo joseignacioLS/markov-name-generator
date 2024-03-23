@@ -11,6 +11,7 @@ import { EToastType, toastContext } from "./context/toast.context";
 import { getRequest } from "./services/request.service";
 import PredictionCard from "./components/PredictionCard/PredictionCard";
 import MarkovInputs from "./components/MarkovInputs/MarkovInputs";
+import SelectInput from "./components/SelectInput/SelectInput";
 
 const markov = new Markov();
 
@@ -134,11 +135,32 @@ export default function Home() {
         ))}
       </div>
       <ToggleCard title={"Ajustes"}>
-        <MarkovInputs
-          input={input}
-          handleInputChange={handleInputChange}
-          selectOptions={sources}
-        />
+        <div
+          style={{
+            padding: "1rem",
+            display: "flex",
+            gap: "1rem",
+            flexDirection: "column",
+          }}
+        >
+          <SelectInput
+            name="predictor"
+            label="Predictor"
+            value={"markov"}
+            setValue={(e) => {}}
+            options={[
+              {
+                name: "markov",
+                value: "markov",
+              },
+            ]}
+          />
+          <MarkovInputs
+            input={input}
+            handleInputChange={handleInputChange}
+            selectOptions={sources}
+          />
+        </div>
       </ToggleCard>
     </main>
   );

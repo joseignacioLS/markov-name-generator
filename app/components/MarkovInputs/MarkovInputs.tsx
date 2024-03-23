@@ -20,7 +20,7 @@ const MarkovInputs = ({
   mode = "edit",
 }: IProps) => {
   return (
-    <div className={styles.inputWrapper}>
+    <>
       <SelectInput
         label="Dataset"
         name="source"
@@ -66,7 +66,7 @@ const MarkovInputs = ({
           setValue={handleInputChange}
         />
       )}
-    </div>
+    </>
   );
 };
 
