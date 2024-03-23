@@ -28,8 +28,10 @@ const Home = () => {
   };
 
   return (
-    <main className={styles.main}>
-      <h1 className={styles.title}>Favoritos</h1>
+    <main>
+      <section className={styles.titles}>
+        <h1 className={styles.title}>Favoritos</h1>
+      </section>
       <div className={styles.predictor}>
         {favorites
           .filter((prediction) => {

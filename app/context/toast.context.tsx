@@ -36,11 +36,8 @@ export const ToastProvider = ({ children }: IProps) => {
 
   const removeToast = (id: number) => {
     setMessages((oldState) => {
-      const message = oldState.find((m) => m.id === id);
-      if (!message || message.expired) return oldState;
       return [
-        ...oldState.filter((m) => m.id !== id),
-        { ...message, expired: true },
+        ...oldState.map((m) => (m.id === id ? { ...m, expired: true } : m)),
       ];
     });
   };

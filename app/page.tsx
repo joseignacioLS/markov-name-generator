@@ -123,8 +123,12 @@ export default function Home() {
   }, [trainData, input.window, input.maxLength, input.minLength]);
 
   return (
-    <main className={styles.main}>
-      <h1 className={styles.title}>Generador de Nombres</h1>
+    <main>
+      <section className={styles.titles}>
+        <h1 className={styles.title}>Generador de Nombres</h1>
+        <h2>Predictor {"Markov"}</h2>
+        <h3>{sources.find((s) => s.value === input.source)?.name}</h3>
+      </section>
       <div
         id="predictionWrapper"
         onScroll={handleScroll}
