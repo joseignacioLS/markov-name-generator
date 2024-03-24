@@ -42,7 +42,7 @@ interface IProps {
   children: ReactNode;
 }
 export const PredictorProvider = ({ children }: IProps) => {
-  const [config, setConfig] = useState<IValue["config"]>(undefined);
+  const [config, setConfig] = useState<IValue["config"]>(FALLBACK_CONFIG);
   const [predictor, setPredictor] = useState<Markov | undefined>(new Markov());
   const [predictions, setPredictions] = useState<IPrediction[]>([]);
   const [trainData, setTrainData] = useState<string[]>([]);
@@ -140,7 +140,7 @@ export const PredictorProvider = ({ children }: IProps) => {
     if (!stored?.config || !stored?.favs) {
       store("markov-names", {
         favs: [],
-        config: FALLBACK_CONFIG,
+        config: { ...FALLBACK_CONFIG },
       });
       return;
     }
