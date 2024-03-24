@@ -14,6 +14,8 @@ import { EPredictor, IPrediction } from "../types";
 import { EToastType, toastContext } from "./toast.context";
 import { sources } from "../utils/dataSources";
 import { getRequest } from "../services/request.service";
+import { recover, store } from "../services/localstorage.service";
+import { useEffectAfterInit } from "../hooks/useEffectAfterInit";
 
 interface IValue {
   config: any;
@@ -33,17 +35,7 @@ interface IProps {
   children: ReactNode;
 }
 export const PredictorProvider = ({ children }: IProps) => {
-  const [config, setConfig] = useState<{
-    window: string;
-    minLength: string;
-    maxLength: string;
-    source: string;
-  }>({
-    window: "3",
-    minLength: "6",
-    maxLength: "12",
-    source: sources[0].value,
-  });
+  const [config, setConfig] = useState<IValue["config"]>(undefined);
   const [predictor, setPredictor] = useState<Markov | undefined>(new Markov());
   const [predictions, setPredictions] = useState<IPrediction[]>([]);
   const [trainData, setTrainData] = useState<string[]>([]);
@@ -76,10 +68,15 @@ export const PredictorProvider = ({ children }: IProps) => {
         {
           id: generateId(),
           value: newName,
-          method: EPredictor.MARKOV,
           length: newName.length,
-          window: +config.window,
-          source: sources.find((s) => s.value === config.source)?.name,
+          date: new Date(),
+          predictor: {
+            method: EPredictor.MARKOV,
+            config: {
+              window: +config.window,
+              source: sources.find((s) => s.value === config.source)?.name,
+            },
+          },
         },
       ];
     });
@@ -103,14 +100,16 @@ export const PredictorProvider = ({ children }: IProps) => {
         .map((n: string) => n.toLowerCase().replace("\r", ""));
       setTrainData(formattedData);
     };
-    getTrainData(config.source);
-  }, [config.source]);
+    if (config?.source) {
+      getTrainData(config.source);
+    }
+  }, [config?.source]);
 
   useEffect(() => {
     const initModel = async (): Promise<void> => {
       if (trainData.length === 0 || !predictor) return;
       setPredictions([]);
-      predictor.generateMarkov(trainData).then(() => {
+      predictor.trainModel(trainData).then(() => {
         addToast(`Modelo de predición generado con éxito`, EToastType.MSG);
 
         for (let i = 0; i < 10; i++) {
@@ -122,12 +121,26 @@ export const PredictorProvider = ({ children }: IProps) => {
   }, [trainData, predictor]);
 
   useEffect(() => {
-    if (!predictor?.trained) return;
+    if (!predictor?.trained || config === undefined) return;
     setPredictions([]);
     for (let i = 0; i < 10; i++) {
       handleNameCreation();
     }
-  }, [config.window, config.minLength, config.maxLength]);
+  }, [config?.window, config?.minLength, config?.maxLength]);
+
+  useEffect(() => {
+    const stored = recover("markov-names");
+    if (!stored?.config || !stored?.favs) {
+      store("markov-names", { favs: [], config });
+      return;
+    }
+    setConfig(stored.config);
+  }, []);
+
+  useEffectAfterInit(() => {
+    const stored = recover("markov-names") || { favs: [], config: {} };
+    store("markov-names", { ...stored, config });
+  }, [config]);
 
   return (
     <predictorContext.Provider

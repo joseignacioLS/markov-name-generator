@@ -31,7 +31,8 @@ const PredictionCard = ({ prediction }: IProps) => {
       className={styles.prediction}
       onClick={handleShowDetail}
       style={{
-        backgroundColor: windowToColor[prediction?.window || "1"],
+        backgroundColor:
+          windowToColor[prediction.predictor?.config?.window || "1"],
       }}
     >
       <span>{prediction.value}</span>

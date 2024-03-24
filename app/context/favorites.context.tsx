@@ -22,10 +22,16 @@ interface IProps {
 export const FavoritesProvider = ({ children }: IProps) => {
   const [favorites, setFavorites] = useState<IPrediction[]>([]);
 
+  const storeFavs = (favs: IPrediction[]) => {
+    const stored = recover("markov-names");
+    stored.favs = favs;
+    store("markov-names", stored);
+  };
+
   const addFav = (fav: IPrediction) => {
     setFavorites((oldState) => {
       const newState = [fav, ...oldState];
-      store("markov-names", { 0: newState });
+      storeFavs(newState);
       return newState;
     });
   };
@@ -33,7 +39,7 @@ export const FavoritesProvider = ({ children }: IProps) => {
   const removeFav = (id: number) => {
     setFavorites((oldState) => {
       const newState = oldState.filter((v) => v.id !== id);
-      store("markov-names", { 0: newState });
+      storeFavs(newState);
       return newState;
     });
   };
@@ -52,9 +58,9 @@ export const FavoritesProvider = ({ children }: IProps) => {
 
   useEffect(() => {
     const recovered = recover("markov-names");
-    if (!recovered?.[0]) return;
+    if (!recovered?.favs) return;
     setFavorites(
-      recovered[0].map((r: any) =>
+      recovered.favs.map((r: any) =>
         r.method ? r : { ...r, method: EPredictor.MARKOV }
       )
     );

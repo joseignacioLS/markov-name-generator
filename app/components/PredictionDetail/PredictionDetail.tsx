@@ -6,17 +6,22 @@ interface IProps {
 }
 
 const PredictionDetail = ({ prediction }: IProps) => {
+  const config = prediction.predictor?.config;
   return (
     <div className={styles.wrapper}>
       <h2>{prediction.value}</h2>
-      <p>
-        <span>Fuente:</span>
-        <span>{prediction.source}</span>
-      </p>
-      <p>
-        <span>Fidelidad:</span>
-        <span>{prediction.window}</span>
-      </p>
+      {config?.source && (
+        <p>
+          <span>Fuente:</span>
+          <span>{config?.source}</span>
+        </p>
+      )}
+      {config?.window && (
+        <p>
+          <span>Fidelidad:</span>
+          <span>{config?.window}</span>
+        </p>
+      )}
     </div>
   );
 };

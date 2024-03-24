@@ -1,4 +1,6 @@
-export class Markov {
+import { IPredictor } from "../types";
+
+export class Markov implements IPredictor {
   private starters: string[];
   private data: { [key: string]: { [key: string]: number } };
   public trained: boolean = false;
@@ -47,7 +49,7 @@ export class Markov {
     }
   }
 
-  async generateMarkov(words: string[]): Promise<boolean> {
+  async trainModel(words: string[]): Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.initValues();
 
@@ -95,17 +97,17 @@ export class Markov {
 
   }
 
-  predict(window: number = 3, min_length: number = 6, max_length: number = 10): string {
+  predict(window: number = 3, minLength: number = 6, maxLength: number = 10): string {
     let prediction = this.initPrediction(window);
     let safe = 1000;
     while (safe > 0) {
       safe--;
       prediction = this.growPrediction(prediction, window);
-      if (prediction.length > max_length + 1) {
+      if (prediction.length > maxLength + 1) {
         prediction = this.initPrediction(window);
       }
       if (prediction.at(-1) === ".") {
-        if (prediction.length >= min_length) {
+        if (prediction.length >= minLength) {
           break;
         } else {
           prediction = this.initPrediction(window);

@@ -45,15 +45,16 @@ export const ToastProvider = ({ children }: IProps) => {
   const addToast = (message: string, type?: IToast["type"]) => {
     const id = generateId();
     setMessages((oldState) => {
-      return [
+      const newState = [
         ...oldState.filter((v) => !v.expired),
         { id, message, type: type || EToastType.MSG, expired: false },
       ];
+      const visibleToastPrev = newState.findIndex((v) => v.id === id);
+      setTimeout(() => {
+        removeToast(id);
+      }, 4000 + 500 * visibleToastPrev);
+      return newState;
     });
-
-    setTimeout(() => {
-      removeToast(id);
-    }, 4000);
   };
   return (
     <toastContext.Provider value={{ messages, addToast, removeToast }}>

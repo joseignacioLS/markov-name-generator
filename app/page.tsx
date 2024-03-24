@@ -45,7 +45,9 @@ export default function Home() {
       <section className={styles.titles}>
         <h1 className={styles.title}>Generador de Nombres</h1>
         <h2>Predictor {"Markov"}</h2>
-        <h3>{sources.find((s) => s.value === input.source)?.name}</h3>
+        <h3>
+          {input?.source && sources.find((s) => s.value === input.source)?.name}
+        </h3>
       </section>
       <div
         id="predictionWrapper"
@@ -78,11 +80,13 @@ export default function Home() {
               },
             ]}
           />
-          <MarkovInputs
-            input={input}
-            handleInputChange={handleInputChange}
-            selectOptions={sources}
-          />
+          {input && (
+            <MarkovInputs
+              input={input}
+              handleInputChange={handleInputChange}
+              selectOptions={sources}
+            />
+          )}
         </div>
       </ToggleCard>
     </main>
