@@ -24,6 +24,13 @@ interface IValue {
   handleNameCreation: () => void;
 }
 
+const FALLBACK_CONFIG = {
+  window: "3",
+  minLength: "6",
+  maxLength: "10",
+  source: sources[0].value,
+};
+
 export const predictorContext = createContext<IValue>({
   config: {},
   setConfig: () => {},
@@ -131,7 +138,10 @@ export const PredictorProvider = ({ children }: IProps) => {
   useEffect(() => {
     const stored = recover("markov-names");
     if (!stored?.config || !stored?.favs) {
-      store("markov-names", { favs: [], config });
+      store("markov-names", {
+        favs: [],
+        config: FALLBACK_CONFIG,
+      });
       return;
     }
     setConfig(stored.config);
