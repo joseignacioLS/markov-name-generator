@@ -38,9 +38,10 @@ const Home = () => {
             const sourceFilter =
               input.source === "" ||
               sources.find((s) => s.value === input.source)?.name ===
-                prediction.source;
+                prediction.predictor?.config?.source;
             const windowFilter =
-              input.window === "0" || prediction.window === +input.window;
+              input.window === "0" ||
+              prediction.predictor?.config?.window === +input.window;
             const lengthFilter =
               input.length === "0" || prediction.length === +input.length;
             return sourceFilter && windowFilter && lengthFilter;
