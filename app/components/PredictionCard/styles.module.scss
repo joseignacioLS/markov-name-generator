@@ -20,9 +20,9 @@
 
   .favButton {
     position: absolute;
-    left: 50%;
-    bottom: 0;
-    transform: translate(-50%, 50%);
+    right: .75rem;
+    top: 50%;
+    transform: translate(0%, -50%);
 
     span {
       color: $color_toast;

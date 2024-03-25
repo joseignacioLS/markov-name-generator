@@ -96,12 +96,7 @@ export const PredictorProvider = ({ children }: IProps) => {
         addToast("Ha habido un error cargando el set de datos", EToastType.ERR);
         return;
       }
-      addToast(
-        `Datos de "${
-          sources.find((s) => s.value === source)?.name
-        }" cargados con éxito`,
-        EToastType.MSG
-      );
+
       const formattedData = response
         .split("\n")
         .map((n: string) => n.toLowerCase().replace("\r", ""));
@@ -117,8 +112,6 @@ export const PredictorProvider = ({ children }: IProps) => {
       if (trainData.length === 0 || !predictor) return;
       setPredictions([]);
       predictor.trainModel(trainData).then(() => {
-        addToast(`Modelo de predición generado con éxito`, EToastType.MSG);
-
         for (let i = 0; i < 10; i++) {
           handleNameCreation();
         }

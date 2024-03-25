@@ -39,11 +39,11 @@ const PredictionCard = ({ prediction }: IProps) => {
       <div className={styles.favButton}>
         <Button onClick={handleFavClick} size="small">
           <span
-            className={`material-symbols-outlined ${
+            className={`material-symbols-outlined filled ${
               isFav(prediction.value) && styles.fav
             }`}
           >
-            {isFav(prediction.value) ? "cancel" : "save"}
+            {isFav(prediction.value) ? "cancel" : "star"}
           </span>
         </Button>
       </div>
