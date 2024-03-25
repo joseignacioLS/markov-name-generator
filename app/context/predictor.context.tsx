@@ -57,11 +57,11 @@ export const PredictorProvider = ({ children }: IProps) => {
       );
       return;
     }
-    const newName: string = predictor.predict(
-      +config.window,
-      +config.minLength,
-      +config.maxLength
-    );
+    const newName: string = predictor.predict({
+      window: +config.window,
+      minLength: +config.minLength,
+      maxLength: +config.maxLength,
+    });
     if (newName === "") {
       addToast(
         "Ha habido un problema con la generación. Vuelve a intentarlo",

@@ -4,8 +4,8 @@ export enum EPredictor {
 
 export interface IPredictor {
   trained: boolean;
-  predict: (window: number, minLength: number, maxLenght: number) => string | Promise<string>
-  trainModel: (value: string[]) => Promise<boolean>
+  predict: (config: { window: number, minLength: number, maxLength: number }) => string | Promise<string>
+  trainModel: (trainData: string[], config?: any) => Promise<boolean>
 }
 
 export interface IPrediction {
