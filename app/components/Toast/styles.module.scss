@@ -6,11 +6,15 @@
   top: .5rem;
   right: .5rem;
   width: fit-content;
-  max-width: 150px;
+  max-width: min(250px, 50%);
+  max-height: 200px;
+  overflow: hidden;
+  mask-image: linear-gradient(to bottom, black 95%, transparent 100%);
   display: flex;
   flex-direction: column;
 
   .toast {
+    flex-shrink: 0;
     width: fit-content;
     background-color: $color_toast;
     padding: 0 1rem;
@@ -63,5 +67,6 @@
     grid-template-rows: 0fr;
     padding: 0 1rem;
     margin-bottom: 0;
+    opacity: 0;
   }
 }

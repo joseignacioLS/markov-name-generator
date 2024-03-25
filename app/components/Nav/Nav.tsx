@@ -13,8 +13,14 @@ const Nav = () => {
         .filter((r) => r.path !== pathname)
         .map((r) => {
           return (
-            <Link key={r.icon} href={r.path}>
-              <span className="material-symbols-outlined">{r.icon}</span>
+            <Link key={r.icon.value} href={r.path}>
+              <span
+                className={`material-symbols-outlined ${
+                  r.icon.filled && "filled"
+                }`}
+              >
+                {r.icon.value}
+              </span>
             </Link>
           );
         })}

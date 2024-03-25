@@ -68,7 +68,7 @@ export default function Home() {
             flexDirection: "column",
           }}
         >
-          <SelectInput
+          {/* <SelectInput
             name="predictor"
             label="Predictor"
             value={"markov"}
@@ -79,7 +79,7 @@ export default function Home() {
                 value: "markov",
               },
             ]}
-          />
+          /> */}
           {input && (
             <MarkovInputs
               input={input}

@@ -1,15 +1,24 @@
 interface IRoute {
-  icon: string;
+  icon: {
+    value: string;
+    filled: boolean;
+  }
   path: string
 }
 
 export const routes: IRoute[] = [
   {
-    icon: "home",
+    icon: {
+      value: "home",
+      filled: true
+    },
     path: "/",
   },
   {
-    icon: "star",
+    icon: {
+      value: "star",
+      filled: true
+    },
     path: "/favs",
   },
 ];
