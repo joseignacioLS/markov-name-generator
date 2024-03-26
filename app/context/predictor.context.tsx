@@ -16,6 +16,8 @@ import { sources } from "../utils/dataSources";
 import { getRequest } from "../services/request.service";
 import { recover, store } from "../services/localstorage.service";
 import { useEffectAfterInit } from "../hooks/useEffectAfterInit";
+import { modalContext } from "./modal.context";
+import CustomSourceInput from "../components/CustomSourceInput/CustomSourceInput";
 
 interface IValue {
   config: any;
@@ -48,6 +50,7 @@ export const PredictorProvider = ({ children }: IProps) => {
   const [trainData, setTrainData] = useState<string[]>([]);
 
   const { addToast } = useContext(toastContext);
+  const { showModal } = useContext(modalContext);
 
   const handleNameCreation = useCallback((): void => {
     if (!predictor) {
@@ -90,6 +93,13 @@ export const PredictorProvider = ({ children }: IProps) => {
   }, [predictor, config, setPredictions]);
 
   useEffect(() => {
+    const processRetrievedData = (data: string) => {
+      const formattedData = data
+        .split("\n")
+        .map((n: string) => n.toLowerCase().replace("\r", ""));
+      setTrainData(formattedData);
+      console.log(formattedData);
+    };
     const getTrainData = async (source: string): Promise<void> => {
       const response = (await getRequest(source)) as string;
       if (response === "") {
@@ -97,14 +107,14 @@ export const PredictorProvider = ({ children }: IProps) => {
         return;
       }
 
-      const formattedData = response
-        .split("\n")
-        .map((n: string) => n.toLowerCase().replace("\r", ""));
-      setTrainData(formattedData);
+      processRetrievedData(response);
     };
-    if (config?.source) {
-      getTrainData(config.source);
+    if (!config?.source) return;
+    if (config.source === "custom") {
+      showModal(<CustomSourceInput setTrainData={processRetrievedData} />);
+      return;
     }
+    getTrainData(config.source);
   }, [config?.source]);
 
   useEffect(() => {

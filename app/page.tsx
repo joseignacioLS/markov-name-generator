@@ -6,7 +6,6 @@ import ToggleCard from "./components/ToggleCard/ToggleCard";
 import { sources } from "./utils/dataSources";
 import PredictionCard from "./components/PredictionCard/PredictionCard";
 import MarkovInputs from "./components/MarkovInputs/MarkovInputs";
-import SelectInput from "./components/SelectInput/SelectInput";
 import { predictorContext } from "./context/predictor.context";
 import Spinner from "./components/Spinner/Spinner";
 
@@ -84,7 +83,7 @@ export default function Home() {
             <MarkovInputs
               input={input}
               handleInputChange={handleInputChange}
-              selectOptions={sources}
+              selectOptions={[...sources, { name: "Custom", value: "custom" }]}
             />
           )}
         </div>

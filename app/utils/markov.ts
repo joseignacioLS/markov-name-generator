@@ -71,11 +71,12 @@ export class Markov implements IPredictor {
   }
 
   private getPredictionWindow(prediction: string, window: number): string {
-    return prediction.slice(-window);
+    return prediction?.slice(-window) || "";
   }
 
   private growPrediction(prediction: string, window: number): string {
     const base_prediction = this.getPredictionWindow(prediction, window);
+    if (base_prediction === "") return prediction
     const options = this.data[base_prediction];
 
     const n = Math.random();
@@ -89,7 +90,6 @@ export class Markov implements IPredictor {
       }
     }
     return prediction
-
   }
 
   predict(config: { window: number, minLength: number, maxLength: number }): string {
@@ -97,6 +97,7 @@ export class Markov implements IPredictor {
     let safe = 1000;
     while (safe > 0) {
       safe--;
+
       prediction = this.growPrediction(prediction, config.window);
       if (prediction.length > config.maxLength + 1) {
         prediction = this.initPrediction(config.window);
