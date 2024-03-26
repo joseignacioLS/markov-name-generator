@@ -15,16 +15,14 @@ export class Markov implements IPredictor {
   }
 
   private processWord(raw_name: string): void {
-    const MAX_WINDOW = 6;
+    const MAX_WINDOW = 32;
     const chars = Array.from(raw_name);
 
-    for (let j = 1; j <= MAX_WINDOW; j++) {
-      if (raw_name.length < MAX_WINDOW) break;
+    for (let j = 1; j <= Math.min(MAX_WINDOW, chars.length - 1); j++) {
       this.starters.push(raw_name.slice(0, j));
     }
     for (let i = 0; i < chars.length; i++) {
-      for (let j = 1; j <= MAX_WINDOW; j++) {
-        if (raw_name.length < MAX_WINDOW) break;
+      for (let j = 1; j <= Math.min(MAX_WINDOW, chars.length - 1); j++) {
 
         const word = chars.slice(i, i + j).join("");
         if (!this.data[word]) {
@@ -104,7 +102,7 @@ export class Markov implements IPredictor {
         prediction = this.initPrediction(config.window);
       }
       if (prediction.at(-1) === ".") {
-        if (prediction.length >= config.minLength) {
+        if (prediction.length > config.minLength) {
           break;
         } else {
           prediction = this.initPrediction(config.window);
