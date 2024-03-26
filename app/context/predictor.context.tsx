@@ -98,7 +98,6 @@ export const PredictorProvider = ({ children }: IProps) => {
         .split("\n")
         .map((n: string) => n.toLowerCase().replace("\r", ""));
       setTrainData(formattedData);
-      console.log(formattedData);
     };
     const getTrainData = async (source: string): Promise<void> => {
       const response = (await getRequest(source)) as string;
