@@ -40,7 +40,7 @@ const MarkovInputs = ({
         <RangeInput
           name="length"
           min="0"
-          max="24"
+          max="16"
           value={input.length}
           label="Longitud"
           setValue={handleInputChange}
@@ -60,7 +60,7 @@ const MarkovInputs = ({
         <RangeInput
           name="maxLength"
           min={`${input.minLength}`}
-          max="24"
+          max="16"
           value={input.maxLength}
           label="Máxima Longitud"
           setValue={handleInputChange}
