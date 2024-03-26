@@ -53,6 +53,7 @@ export class Markov implements IPredictor {
       }
 
       this.adjustProbs();
+
       this.trained = true;
       resolve(true);
     });

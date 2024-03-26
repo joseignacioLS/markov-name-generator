@@ -1,4 +1,4 @@
-import { ChangeEvent } from "react";
+import { ChangeEvent, ReactNode } from "react";
 import styles from "./styles.module.scss";
 
 interface IProps {
@@ -7,7 +7,7 @@ interface IProps {
   name: string;
   min: string;
   max: string;
-  label?: string;
+  label?: ReactNode;
   vertical?: boolean;
 }
 
@@ -21,8 +21,8 @@ const RangeInput = ({
   vertical = false,
 }: IProps) => {
   return (
-    <div className={`${styles.wrapper} ${vertical && styles.vertical}`}>
-      <span className={styles.label}>{label}</span>
+    <div className={`${styles.wrapper} ${label && styles.labelled} `}>
+      {label && <span className={styles.label}>{label}</span>}
       <span className={styles.value}>{value}</span>
       <input
         className={styles.input}

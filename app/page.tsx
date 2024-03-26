@@ -41,13 +41,13 @@ export default function Home() {
 
   return (
     <main>
-      <section className={styles.titles}>
+      <header className={styles.titles}>
         <h1 className={styles.title}>Generador de Nombres</h1>
         <h2>Predictor {"Markov"}</h2>
         <h3>
           {input?.source && sources.find((s) => s.value === input.source)?.name}
         </h3>
-      </section>
+      </header>
       <div
         id="predictionWrapper"
         onScroll={handleScroll}

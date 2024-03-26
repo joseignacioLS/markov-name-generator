@@ -21,4 +21,11 @@ export const routes: IRoute[] = [
     },
     path: "/favs",
   },
+  {
+    icon: {
+      value: "help",
+      filled: true
+    },
+    path: "/how-it-works"
+  }
 ];

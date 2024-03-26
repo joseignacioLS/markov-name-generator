@@ -29,9 +29,9 @@ const Home = () => {
 
   return (
     <main>
-      <section className={styles.titles}>
+      <header>
         <h1 className={styles.title}>Favoritos</h1>
-      </section>
+      </header>
       <div className={styles.predictionWrapper}>
         {favorites
           .filter((prediction) => {
