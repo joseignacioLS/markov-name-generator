@@ -38,7 +38,6 @@ const processWord = (
       data[word][next_char]++;
     }
   }
-
   return data;
 };
 
@@ -70,6 +69,10 @@ const HowItWorks = ({}: IProps) => {
       return { ...oldState, [name]: value };
     });
     setGeneratedWord(exampleWord.slice(0, +value));
+    setSelectedNGram(() => {
+      const word = exampleWord.slice(0, +value);
+      return word.slice(word.length - +value);
+    });
   };
 
   const resetGeneratedWord = () => {
@@ -218,18 +221,20 @@ const HowItWorks = ({}: IProps) => {
         <div className={styles.interactiveExample}>
           <div className={styles.splittedWordWrapper}>
             {generatedWord.split("").map((chr, i) => {
-              if (
-                i === generatedWord.length - 1 &&
-                generatedWord.length > +input.window
-              ) {
-                const prevNGram = generatedWord.slice(
-                  generatedWord.length - +input.window - 1,
-                  generatedWord.length - 1
+              if (i === generatedWord.length - 1) {
+                let otherOptions: string[] = [];
+                if (generatedWord.length > +input.window) {
+                  const prevNGram = generatedWord.slice(
+                    generatedWord.length - +input.window - 1,
+                    generatedWord.length - 1
+                  );
+                  otherOptions = Object.keys(processedWord[prevNGram]).filter(
+                    (v) => v !== chr
+                  );
+                }
+                const nextOptions = Object.keys(
+                  processedWord[selectedNGram] || {}
                 );
-                const otherOptions = Object.keys(
-                  processedWord[prevNGram]
-                ).filter((v) => v !== chr);
-                const nextOptions = Object.keys(processedWord[selectedNGram]);
                 return (
                   <div key={i + chr} style={{ display: "flex" }}>
                     <div>
@@ -272,7 +277,17 @@ const HowItWorks = ({}: IProps) => {
                   </div>
                 );
               }
-              return <span key={i + chr}>{chr}</span>;
+              return (
+                <span
+                  key={i + chr}
+                  style={{
+                    backgroundColor:
+                      i >= generatedWord.length - +input.window ? color[1] : "",
+                  }}
+                >
+                  {chr}
+                </span>
+              );
             })}
           </div>
           <div
