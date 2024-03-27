@@ -3,7 +3,6 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import RangeInput from "../RangeInput/RangeInput";
 import styles from "./styles.module.scss";
-import SelectInput from "../SelectInput/SelectInput";
 import Button from "../Button/Button";
 
 const color: { [key: number]: string } = {
@@ -45,7 +44,7 @@ const processWord = (
 
 interface IProps {}
 const HowItWorks = ({}: IProps) => {
-  const exampleWord = "testimonio";
+  const exampleWord = "temperamento";
 
   const [input, setInput] = useState({
     window: 1,
@@ -59,18 +58,18 @@ const HowItWorks = ({}: IProps) => {
     generatedWord.slice(generatedWord.length - +input.window)
   );
 
+  const [disableButtons, setDisableButtons] = useState({
+    next: false,
+    change: true,
+    back: true,
+  });
+
   const handleInput = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setInput((oldState) => {
       return { ...oldState, [name]: value };
     });
     setGeneratedWord(exampleWord.slice(0, +value));
-  };
-
-  const handleGenerateStep = (e: ChangeEvent<HTMLSelectElement>) => {
-    const { value } = e.target;
-    if (value === "") return;
-    setGeneratedWord((oldValue) => oldValue + value);
   };
 
   const resetGeneratedWord = () => {
@@ -92,8 +91,43 @@ const HowItWorks = ({}: IProps) => {
     });
   };
 
+  const modifyLastLetter = () => {
+    setGeneratedWord((oldState) => {
+      const base = oldState.slice(
+        oldState.length - (+input.window + 1),
+        oldState.length - 1
+      );
+      const options = Object.keys(processedWord[base]).filter(
+        (v) => v !== "." && v !== oldState[oldState.length - 1]
+      );
+      if (options.length === 0) {
+        return oldState;
+      }
+      return (
+        oldState.slice(0, oldState.length - 1) +
+        options[Math.floor(Math.random() * options.length)]
+      );
+    });
+  };
+
   useEffect(() => {
-    setSelectedNGram(generatedWord.slice(generatedWord.length - +input.window));
+    const ngram = generatedWord.slice(generatedWord.length - +input.window);
+    setSelectedNGram(ngram);
+    const back = generatedWord.length === +input.window;
+    const prevNGram =
+      !back &&
+      generatedWord.slice(
+        generatedWord.length - +input.window - 1,
+        generatedWord.length - 1
+      );
+    const prevOptions = prevNGram ? Object.keys(processedWord[prevNGram]) : [];
+    const change = back || prevOptions.length < 2;
+
+    const options = Object.keys(processedWord[ngram]).filter((v) => v !== ".");
+    const next = options.length < 1;
+    setDisableButtons((oldState) => {
+      return { ...oldState, back, change, next };
+    });
   }, [generatedWord]);
 
   const processedWord = processWord(exampleWord, input.window);
@@ -108,8 +142,6 @@ const HowItWorks = ({}: IProps) => {
           </p>
           <p>
             Para ello, las palabras se separan en n-gramas (grupos de n-letras).
-            Usa el slider de abajo para ver como la palabra se divide en los
-            diferentes grupos.
           </p>
         </div>
         <div className={styles.interactiveExample}>
@@ -140,46 +172,36 @@ const HowItWorks = ({}: IProps) => {
           Generación de N-gramas interactiva
         </span>
         <p>
-          De esta forma obtenemos grupos de letras de tamaño n ({input.window}{" "}
-          en este caso) y la siguiente letra que aparece en la palabra
+          De esta forma se obtienen n-gramas de tamaño n ({input.window} en este
+          caso).
         </p>
       </section>
       <section className={styles.howToBlock}>
         <h2>Determinar siguientes letras para cada N-grama</h2>
         <p>
-          Una vez analizadas todas las palabras, sabremos para cada n-grama
-          todas las posibles letras que pueden venir después, y con que
-          frecuencia
+          Una vez analizadas todas las palabras, se obtiene para cada n-grama
+          diferente todas las posibles letras que pueden venir después.
         </p>
         <div className={styles.interactiveExample}>
           <div className={styles.ngramTable}>
-            <span>N-Grama</span>
-            <span>Opciones</span>
+            <div className={styles.row}>
+              <span>N-Grama</span>
+              <span>Opciones</span>
+            </div>
             {Object.keys(processedWord)
               .filter((k) => {
                 return k.length === +input.window;
               })
               .map((k, i) => {
                 return (
-                  <>
-                    <span
-                      key={k + i}
-                      style={{
-                        backgroundColor: selectedNGram === k ? color[1] : "",
-                      }}
-                    >
-                      {k}
-                    </span>
-                    <div key={k + "__options"} className={styles.ngramOptions}>
+                  <div key={k + i} className={styles.row}>
+                    <span>{k}</span>
+                    <div className={styles.ngramOptions}>
                       {Object.keys(processedWord[k]).map((sk) => {
-                        return (
-                          <span
-                            key={k + "_" + sk}
-                          >{`'${sk}': ${processedWord[k][sk]}`}</span>
-                        );
+                        return <span key={k + "_" + sk}>{sk}</span>;
                       })}
                     </div>
-                  </>
+                  </div>
                 );
               })}
           </div>
@@ -190,70 +212,103 @@ const HowItWorks = ({}: IProps) => {
       <section className={styles.howToBlock}>
         <h2>Predecir</h2>
         <p>
-          Usando esta información podemos generar palabras al azar, haciendo
-          crecer nuestra palabra en base a las posibilidades y sus frecuencias.
+          Usando esta información se generan palabras al azar, haciendo crecer
+          la palabra en base al último n-grama que la conforma.
         </p>
         <div className={styles.interactiveExample}>
           <div className={styles.splittedWordWrapper}>
             {generatedWord.split("").map((chr, i) => {
-              return (
-                <span
-                  key={i + chr}
-                  style={{
-                    backgroundColor:
-                      i >= generatedWord.length - input.window ? color[1] : "",
-                  }}
-                >
-                  {chr}
-                </span>
-              );
+              if (
+                i === generatedWord.length - 1 &&
+                generatedWord.length > +input.window
+              ) {
+                const prevNGram = generatedWord.slice(
+                  generatedWord.length - +input.window - 1,
+                  generatedWord.length - 1
+                );
+                const otherOptions = Object.keys(
+                  processedWord[prevNGram]
+                ).filter((v) => v !== chr);
+                const nextOptions = Object.keys(processedWord[selectedNGram]);
+                return (
+                  <div key={i + chr} style={{ display: "flex" }}>
+                    <div>
+                      <span
+                        style={{
+                          backgroundColor: color[1],
+                        }}
+                      >
+                        {chr}
+                      </span>
+                      {otherOptions.map((o) => {
+                        return (
+                          <span
+                            key={o}
+                            style={{
+                              opacity: ".75",
+                              backgroundColor: color[0],
+                            }}
+                          >
+                            {o}
+                          </span>
+                        );
+                      })}
+                    </div>
+                    <div>
+                      {nextOptions.map((o) => {
+                        return (
+                          <span
+                            key={o}
+                            style={{
+                              opacity: ".75",
+                              backgroundColor: color[1],
+                            }}
+                          >
+                            {o}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              }
+              return <span key={i + chr}>{chr}</span>;
             })}
           </div>
-          {/* <SelectInput
-            name="options"
-            value=""
-            setValue={handleGenerateStep}
-            options={[
-              { name: "Siguiente", value: "" },
-              ...Object.keys(
-                processedWord[
-                  generatedWord.slice(generatedWord.length - input.window)
-                ]
-              )
-                .filter((k) => k !== ".")
-                .map((k) => {
-                  return {
-                    name: k,
-                    value: k,
-                  };
-                }),
-            ]}
-          /> */}
           <div
             style={{
               justifySelf: "right",
+              flexDirection: "column",
               display: "flex",
               gap: ".5rem",
             }}
           >
             <Button
+              onClick={addLetterToWord}
+              size="small"
+              disabled={disableButtons.next}
+            >
+              <span className="material-symbols-outlined filled">redo</span>
+            </Button>
+            <Button
+              onClick={modifyLastLetter}
+              size="small"
+              disabled={disableButtons.change}
+            >
+              <span className="material-symbols-outlined filled">sync</span>
+            </Button>
+            <Button
               onClick={resetGeneratedWord}
               size="small"
-              disabled={generatedWord.length <= +input.window}
+              disabled={disableButtons.back}
             >
               <span className="material-symbols-outlined filled">undo</span>
-            </Button>
-            {/* <Button onClick={addLetterToWord} size="small" disabled>
-              <span className="material-symbols-outlined filled">sync</span>
-            </Button> */}
-            <Button onClick={addLetterToWord} size="small">
-              <span className="material-symbols-outlined filled">redo</span>
             </Button>
           </div>
         </div>
         <span className={styles.caption}>Predicción interactiva</span>
         <p>
-          Cuanto mayor sea el tamaño del N-grama, más fiel a la palabra original
+          Cuanto mayor sea el tamaño del n-grama más fiel a la palabra original
           será la predicción y menos opciones (incluso ninguna) habrá para hacer
           crecer la palabra.
         </p>
