@@ -83,8 +83,14 @@ const HowItWorks = ({}: IProps) => {
     );
   };
 
-  const addLetterToWord = () => {
+  const addLetterToWord = (letter: string = "") => {
     setGeneratedWord((oldState) => {
+      if (letter === ".") {
+        return oldState;
+      }
+      if (letter) {
+        return oldState + letter;
+      }
       const base = oldState.slice(oldState.length - +input.window);
       const options = Object.keys(processedWord[base]).filter((v) => v !== ".");
       if (options.length === 0) {
@@ -94,8 +100,11 @@ const HowItWorks = ({}: IProps) => {
     });
   };
 
-  const modifyLastLetter = () => {
+  const modifyLastLetter = (letter: string = "") => {
     setGeneratedWord((oldState) => {
+      if (letter) {
+        return oldState.slice(0, oldState.length - 1) + letter;
+      }
       const base = oldState.slice(
         oldState.length - (+input.window + 1),
         oldState.length - 1
@@ -199,11 +208,11 @@ const HowItWorks = ({}: IProps) => {
                 return (
                   <div key={k + i} className={styles.row}>
                     <span>{k}</span>
-                    <div className={styles.ngramOptions}>
-                      {Object.keys(processedWord[k]).map((sk) => {
-                        return <span key={k + "_" + sk}>{sk}</span>;
-                      })}
-                    </div>
+                    <span>
+                      {Object.keys(processedWord[k])
+                        .map((sk) => `'${sk}'`)
+                        .join(" / ")}
+                    </span>
                   </div>
                 );
               })}
@@ -237,7 +246,13 @@ const HowItWorks = ({}: IProps) => {
                 );
                 return (
                   <div key={i + chr} style={{ display: "flex" }}>
-                    <div>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: ".5rem",
+                      }}
+                    >
                       <span
                         style={{
                           backgroundColor: color[1],
@@ -253,13 +268,20 @@ const HowItWorks = ({}: IProps) => {
                               opacity: ".75",
                               backgroundColor: color[0],
                             }}
+                            onClick={() => modifyLastLetter(o)}
                           >
                             {o}
                           </span>
                         );
                       })}
                     </div>
-                    <div>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: ".5rem",
+                      }}
+                    >
                       {nextOptions.map((o) => {
                         return (
                           <span
@@ -267,7 +289,9 @@ const HowItWorks = ({}: IProps) => {
                             style={{
                               opacity: ".75",
                               backgroundColor: color[1],
+                              marginLeft: ".5rem",
                             }}
+                            onClick={() => addLetterToWord(o)}
                           >
                             {o}
                           </span>
@@ -298,20 +322,20 @@ const HowItWorks = ({}: IProps) => {
               gap: ".5rem",
             }}
           >
-            <Button
-              onClick={addLetterToWord}
+            {/* <Button
+              onClick={() => addLetterToWord("")}
               size="small"
               disabled={disableButtons.next}
             >
               <span className="material-symbols-outlined filled">redo</span>
             </Button>
             <Button
-              onClick={modifyLastLetter}
+              onClick={() => modifyLastLetter("")}
               size="small"
               disabled={disableButtons.change}
             >
               <span className="material-symbols-outlined filled">sync</span>
-            </Button>
+            </Button> */}
             <Button
               onClick={resetGeneratedWord}
               size="small"
