@@ -1,11 +1,16 @@
 export enum EPredictor {
-  MARKOV = "MARKOV"
+  MARKOV = "MARKOV",
 }
 
 export interface IPredictor {
   trained: boolean;
-  predict: (config: { window: number, minLength: number, maxLength: number }) => string | Promise<string>
-  trainModel: (trainData: string[], config?: any) => Promise<boolean>
+  predict: (config: {
+    window: number;
+    windowPredict: number;
+    minLength: number;
+    maxLength: number;
+  }) => string | Promise<string>;
+  trainModel: (trainData: string[], config?: any) => Promise<boolean>;
 }
 
 export interface IPrediction {
@@ -14,7 +19,7 @@ export interface IPrediction {
   length: number;
   date: Date;
   predictor: {
-    method: EPredictor,
-    config: any
-  }
+    method: EPredictor;
+    config: any;
+  };
 }
