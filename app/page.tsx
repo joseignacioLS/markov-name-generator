@@ -14,17 +14,14 @@ export default function Home() {
     predictions,
     handleNameCreation,
     config: input,
-    setConfig: setInput,
+    updateConfig,
   } = useContext(predictorContext);
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
   ) => {
     const { name, value }: { name: string; value: string } = e.target;
-
-    setInput((oldState: any) => {
-      return { ...oldState, [name]: value };
-    });
+    updateConfig(name, value);
   };
 
   const handleScroll = (e: UIEvent<HTMLElement>) => {

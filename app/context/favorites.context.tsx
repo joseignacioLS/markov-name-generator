@@ -29,6 +29,7 @@ export const FavoritesProvider = ({ children }: IProps) => {
   };
 
   const addFav = (fav: IPrediction) => {
+    console.log({ fav });
     setFavorites((oldState) => {
       const newState = [fav, ...oldState];
       storeFavs(newState);

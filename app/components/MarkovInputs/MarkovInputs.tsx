@@ -28,14 +28,26 @@ const MarkovInputs = ({
         setValue={handleInputChange}
         options={selectOptions}
       />
-      <RangeInput
-        name="window"
-        min={mode === "edit" ? "1" : "0"}
-        max="6"
-        value={input.window}
-        label="Fidelidad"
-        setValue={handleInputChange}
-      />
+      {mode === "edit" && (
+        <RangeInput
+          name="window"
+          min={mode === "edit" ? "1" : "0"}
+          max="6"
+          value={input.window}
+          label="Fidelidad"
+          setValue={handleInputChange}
+        />
+      )}
+      {/* {mode === "edit" && (
+        <RangeInput
+          name="windowPredict"
+          min="1"
+          max="6"
+          value={input.windowPredict}
+          label="Temperatura"
+          setValue={handleInputChange}
+        />
+      )} */}
       {mode === "filter" && (
         <RangeInput
           name="length"

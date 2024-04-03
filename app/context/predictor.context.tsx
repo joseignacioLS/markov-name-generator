@@ -21,13 +21,14 @@ import CustomSourceInput from "../components/CustomSourceInput/CustomSourceInput
 
 interface IValue {
   config: any;
-  setConfig: any;
+  updateConfig: any;
   predictions: IPrediction[];
   handleNameCreation: () => void;
 }
 
 const FALLBACK_CONFIG = {
   window: "3",
+  windowPredict: "1",
   minLength: "6",
   maxLength: "10",
   source: sources[0].value,
@@ -35,7 +36,7 @@ const FALLBACK_CONFIG = {
 
 export const predictorContext = createContext<IValue>({
   config: {},
-  setConfig: () => {},
+  updateConfig: () => {},
   predictions: [],
   handleNameCreation: () => {},
 });
@@ -62,6 +63,7 @@ export const PredictorProvider = ({ children }: IProps) => {
     }
     const newName: string = predictor.predict({
       window: +config.window,
+      windowPredict: +config.windowPredict,
       minLength: +config.minLength,
       maxLength: +config.maxLength,
     });
@@ -84,6 +86,7 @@ export const PredictorProvider = ({ children }: IProps) => {
             method: EPredictor.MARKOV,
             config: {
               window: +config.window,
+              windowPredict: +config.windowPredict,
               source: sources.find((s) => s.value === config.source)?.name,
             },
           },
@@ -135,7 +138,36 @@ export const PredictorProvider = ({ children }: IProps) => {
     for (let i = 0; i < 10; i++) {
       handleNameCreation();
     }
-  }, [config?.window, config?.minLength, config?.maxLength]);
+  }, [
+    config?.window,
+    config?.minLength,
+    config?.maxLength,
+    config?.windowPredict,
+  ]);
+
+  const updateConfig = (name: string, value: any) => {
+    setConfig((oldState: any) => {
+      if (name === "maxLength") {
+        if (+oldState.window > +value) {
+          addToast(
+            "El valor de longitud máxima no puede ser inferior a la fidelidad",
+            EToastType.WRN
+          );
+          return oldState;
+        }
+      }
+      if (name === "window") {
+        if (+oldState.maxLength < +value) {
+          addToast(
+            "El valor de fidelidad no puede ser superior a la longitud máxima",
+            EToastType.WRN
+          );
+          return oldState;
+        }
+      }
+      return { ...oldState, [name]: value };
+    });
+  };
 
   useEffect(() => {
     const stored = recover("markov-names");
@@ -160,7 +192,7 @@ export const PredictorProvider = ({ children }: IProps) => {
         predictions,
         handleNameCreation,
         config,
-        setConfig,
+        updateConfig,
       }}
     >
       {children}
