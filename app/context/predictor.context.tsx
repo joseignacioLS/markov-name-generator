@@ -169,6 +169,16 @@ export const PredictorProvider = ({ children }: IProps) => {
     });
   };
 
+  const checkStoredConfig = (config: any) => {
+    return {
+      window: +(config.window || FALLBACK_CONFIG.window),
+      windowPredict: +(config.windowPredict || FALLBACK_CONFIG.windowPredict),
+      minLength: +(config.minLength || FALLBACK_CONFIG.minLength),
+      maxLength: +(config.maxLength || FALLBACK_CONFIG.maxLength),
+      source: config.source || FALLBACK_CONFIG.source,
+    };
+  };
+
   useEffect(() => {
     const stored = recover("markov-names");
     if (!stored?.config || !stored?.favs) {
@@ -178,11 +188,12 @@ export const PredictorProvider = ({ children }: IProps) => {
       });
       return;
     }
-    setConfig(stored.config);
+    setConfig(checkStoredConfig(stored.config));
   }, []);
 
   useEffectAfterInit(() => {
     const stored = recover("markov-names") || { favs: [], config: {} };
+    console.log({ config });
     store("markov-names", { ...stored, config });
   }, [config]);
 

@@ -7,7 +7,7 @@ export class Markov implements IPredictor {
   } = {};
   public trained: boolean = false;
 
-  constructor() {}
+  constructor() { }
 
   private initValues(): void {
     this.starters = [];
