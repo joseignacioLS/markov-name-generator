@@ -128,14 +128,14 @@ export class Markov implements IPredictor {
     return prediction;
   }
 
-  checkPredictionValidity(prediction: string): string {
+  private validatePrediction(prediction: string): string {
     if (prediction.at(-1) !== ".") {
       return "";
     }
     return prediction.replace(".", "");
   }
 
-  generatePrediction(config: {
+  private generatePrediction(config: {
     window: number;
     windowPredict: number;
     minLength: number;
@@ -150,18 +150,34 @@ export class Markov implements IPredictor {
       );
 
       if (prediction === "" || prediction.length > config.maxLength + 1) {
-        prediction = this.initPrediction(config.window);
+        break
+      }
+
+      if (prediction.at(-1) !== ".") {
         continue
       }
-      if (prediction.at(-1) === ".") {
-        if (prediction.length > config.minLength) {
-          break;
-        } else {
-          return ""
-        }
+
+      if (prediction.length > config.minLength) {
+        return this.validatePrediction(prediction);
+      } else {
+        break;
       }
     }
-    return this.checkPredictionValidity(prediction)
+    return "";
+  }
+
+  private recursivePredictionHandler(config: {
+    window: number;
+    windowPredict: number;
+    minLength: number;
+    maxLength: number;
+  },
+    epoch = 1,
+    maxEpochs = 500): string {
+    if (maxEpochs < epoch) return ""
+    const prediction = this.generatePrediction(config);
+    return prediction === "" ? this.recursivePredictionHandler(config, epoch + 1, maxEpochs) : prediction;
+
   }
 
   predict(config: {
@@ -169,14 +185,8 @@ export class Markov implements IPredictor {
     windowPredict: number;
     minLength: number;
     maxLength: number;
+    maxTries?: number;
   }): string {
-    const MAX_TRIES = 10
-    for (let t = 0; t < MAX_TRIES; t++) {
-      const prediction = this.generatePrediction(config)
-      if (prediction !== "") {
-        return prediction
-      }
-    }
-    return ""
+    return this.recursivePredictionHandler(config)
   }
 }
