@@ -112,7 +112,9 @@ export class Markov implements IPredictor {
     const basePrediction = this.getPredictionWindow(prediction, window);
     if (basePrediction === "") return prediction;
     const options = this.data[basePrediction][windowPrediction];
-
+    if (options.length === 0) {
+      return ""
+    }
     const n = Math.random();
 
     let t_prob = 0;
@@ -126,38 +128,55 @@ export class Markov implements IPredictor {
     return prediction;
   }
 
-  predict(config: {
+  checkPredictionValidity(prediction: string): string {
+    if (prediction.at(-1) !== ".") {
+      return "";
+    }
+    return prediction.replace(".", "");
+  }
+
+  generatePrediction(config: {
     window: number;
     windowPredict: number;
     minLength: number;
     maxLength: number;
   }): string {
     let prediction = this.initPrediction(config.window);
-    let safe = 1000;
-    while (safe > 0) {
-      safe--;
-
+    for (let i = 0; i < config.maxLength; i++) {
       prediction = this.growPrediction(
         prediction,
         config.window,
         config.windowPredict
       );
 
-      if (prediction.length > config.maxLength + 1) {
+      if (prediction === "" || prediction.length > config.maxLength + 1) {
         prediction = this.initPrediction(config.window);
+        continue
       }
       if (prediction.at(-1) === ".") {
         if (prediction.length > config.minLength) {
           break;
         } else {
-          prediction = this.initPrediction(config.window);
+          return ""
         }
       }
     }
+    return this.checkPredictionValidity(prediction)
+  }
 
-    if (safe === 0) {
-      return "";
+  predict(config: {
+    window: number;
+    windowPredict: number;
+    minLength: number;
+    maxLength: number;
+  }): string {
+    const MAX_TRIES = 10
+    for (let t = 0; t < MAX_TRIES; t++) {
+      const prediction = this.generatePrediction(config)
+      if (prediction !== "") {
+        return prediction
+      }
     }
-    return prediction.replace(".", "");
+    return ""
   }
 }

@@ -42,9 +42,25 @@ export const ToastProvider = ({ children }: IProps) => {
     });
   };
 
+  const checkIfToastExists = (
+    messages: IToast[],
+    message: string,
+    type: IToast["type"]
+  ) => {
+    return (
+      messages.find(
+        (m) => m.message === message && m.type === type && !m.expired
+      ) !== undefined
+    );
+  };
+
   const addToast = (message: string, type?: IToast["type"]) => {
     const id = generateId();
     setMessages((oldState) => {
+      if (checkIfToastExists(oldState, message, type || EToastType.MSG)) {
+        return oldState.filter((v) => !v.expired);
+      }
+
       const newState = [
         ...oldState.filter((v) => !v.expired),
         { id, message, type: type || EToastType.MSG, expired: false },
