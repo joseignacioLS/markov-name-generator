@@ -8,18 +8,9 @@ interface IProps {
   min: string;
   max: string;
   label?: ReactNode;
-  vertical?: boolean;
 }
 
-const RangeInput = ({
-  value,
-  setValue,
-  name,
-  min,
-  max,
-  label,
-  vertical = false,
-}: IProps) => {
+const RangeInput = ({ value, setValue, name, min, max, label }: IProps) => {
   return (
     <div className={`${styles.wrapper} ${label && styles.labelled} `}>
       {label && <span className={styles.label}>{label}</span>}
