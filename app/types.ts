@@ -18,6 +18,7 @@ export interface IPrediction {
   value: string;
   length: number;
   date: Date;
+  prob?: number;
   predictor: {
     method: EPredictor;
     config: any;

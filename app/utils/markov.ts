@@ -189,4 +189,18 @@ export class Markov implements IPredictor {
   }): string {
     return this.recursivePredictionHandler(config)
   }
+
+  evaluateProbability(prediction: string, config: any): number {
+    let total = 1;
+    for (let i = 0; i < prediction.length - (+config.window); i++) {
+      const base = prediction.slice(i, i + +config.window)
+      if (i === 0) {
+        total = this.starters.filter(v => v === base).length / this.starters.length
+      }
+      const pre = prediction.slice(i + +config.window, i + +config.window + 1)
+      const prob = this.data[base]?.[config.windowPredict]?.[pre] || 0
+      total *= prob
+    }
+    return total;
+  }
 }

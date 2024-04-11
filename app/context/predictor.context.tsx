@@ -82,6 +82,7 @@ export const PredictorProvider = ({ children }: IProps) => {
           value: newName,
           length: newName.length,
           date: new Date(),
+          prob: predictor.evaluateProbability(newName, config),
           predictor: {
             method: EPredictor.MARKOV,
             config: {

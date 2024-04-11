@@ -22,6 +22,12 @@ const PredictionDetail = ({ prediction }: IProps) => {
           <span>{config?.window}</span>
         </p>
       )}
+      {(prediction?.prob || 0) > 0 && (
+        <p>
+          <span>Probabilidad:</span>
+          <span>{Math.floor((prediction.prob || 0) * 1000000) / 10000}%</span>
+        </p>
+      )}
     </div>
   );
 };
