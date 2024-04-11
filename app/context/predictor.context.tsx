@@ -49,6 +49,7 @@ export const PredictorProvider = ({ children }: IProps) => {
   const [predictor, setPredictor] = useState<Markov | undefined>(new Markov());
   const [predictions, setPredictions] = useState<IPrediction[]>([]);
   const [trainData, setTrainData] = useState<string[]>([]);
+  const [isTraining, setIsTraining] = useState<boolean>(false);
 
   const { addToast } = useContext(toastContext);
   const { showModal } = useContext(modalContext);
@@ -118,13 +119,15 @@ export const PredictorProvider = ({ children }: IProps) => {
       return;
     }
     getTrainData(config.source);
+    setPredictions([]);
   }, [config?.source]);
 
   useEffect(() => {
     const initModel = async (): Promise<void> => {
       if (trainData.length === 0 || !predictor) return;
-      setPredictions([]);
+      setIsTraining(true);
       predictor.trainModel(trainData).then(() => {
+        setIsTraining(false);
         for (let i = 0; i < 10; i++) {
           handleNameCreation();
         }
@@ -194,7 +197,6 @@ export const PredictorProvider = ({ children }: IProps) => {
 
   useEffectAfterInit(() => {
     const stored = recover("markov-names") || { favs: [], config: {} };
-    console.log({ config });
     store("markov-names", { ...stored, config });
   }, [config]);
 

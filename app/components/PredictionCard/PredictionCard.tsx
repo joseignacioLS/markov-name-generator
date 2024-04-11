@@ -6,7 +6,6 @@ import { modalContext } from "@/app/context/modal.context";
 import styles from "./styles.module.scss";
 import Button from "../Button/Button";
 import { favoritesContext } from "@/app/context/favorites.context";
-import { windowToColor } from "@/app/utils/other";
 
 interface IProps {
   prediction: IPrediction;
@@ -30,10 +29,6 @@ const PredictionCard = ({ prediction }: IProps) => {
       key={prediction.id}
       className={styles.prediction}
       onClick={handleShowDetail}
-      style={{
-        backgroundColor:
-          windowToColor[prediction.predictor?.config?.window || "1"],
-      }}
     >
       <span>{prediction.value}</span>
       <div className={styles.favButton}>

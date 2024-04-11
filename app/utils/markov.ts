@@ -7,7 +7,7 @@ export class Markov implements IPredictor {
   } = {};
   public trained: boolean = false;
 
-  constructor() { }
+  constructor() {}
 
   private initValues(): void {
     this.starters = [];
@@ -15,32 +15,41 @@ export class Markov implements IPredictor {
     this.trained = false;
   }
 
-  private processWord(raw_name: string): void {
+  private processWord(raw_word: string): void {
     const MAX_WINDOW = 32;
     const MAX_PREDICTION_WINDOW = 6;
 
-    for (let position = 0; position < raw_name.length; position += 1) {
+    // for position in word
+    for (let position = 0; position < raw_word.length; position += 1) {
+      // for window length
       for (let window = 1; window <= MAX_WINDOW; window += 1) {
-        if (position + window > raw_name.length + 1) {
+        if (position + window > raw_word.length + 1) {
           continue;
         }
-        const predictionInput = raw_name.slice(position, position + window);
+        const predictionInput: string = raw_word.slice(
+          position,
+          position + window
+        );
         if (position === 0) {
           this.starters.push(predictionInput);
         }
+        // for forward window length
         for (
           let predictionWindow = 1;
           predictionWindow <= MAX_PREDICTION_WINDOW;
           predictionWindow += 1
         ) {
-          const predictionOutput = raw_name.slice(
+          const predictionOutput = raw_word.slice(
             position + window,
             position + window + predictionWindow
           );
+          // add dot if word end
           const finalPredictionOutput =
             predictionOutput.length < predictionWindow
               ? predictionOutput + "."
               : predictionOutput;
+
+          // initialize object if needed
           if (!this.data[predictionInput]) {
             this.data[predictionInput] = {};
           }
@@ -54,10 +63,14 @@ export class Markov implements IPredictor {
               finalPredictionOutput
             ] = 0;
           }
+
           this.data[predictionInput][predictionWindow][finalPredictionOutput]++;
         }
       }
     }
+  }
+  private processWords(words: string[]): void {
+    words.forEach((word) => this.processWord(word));
   }
 
   async trainModel(trainData: string[]): Promise<boolean> {
@@ -65,9 +78,7 @@ export class Markov implements IPredictor {
       try {
         this.initValues();
 
-        for (const name of trainData) {
-          this.processWord(name);
-        }
+        this.processWords(trainData);
 
         this.adjustProbs();
 
@@ -82,7 +93,7 @@ export class Markov implements IPredictor {
   private adjustProbs(): void {
     for (const key in this.data) {
       for (const keyWindow in this.data[key]) {
-        const total = Object.keys(this.data[key][keyWindow]).reduce(
+        const total: number = Object.keys(this.data[key][keyWindow]).reduce(
           (acc, subkey) => acc + this.data[key][keyWindow][subkey],
           0
         );
@@ -104,28 +115,52 @@ export class Markov implements IPredictor {
     return prediction?.slice(-window) || "";
   }
 
-  private growPrediction(
-    prediction: string,
-    window: number,
-    windowPrediction: number = 1
-  ): string {
-    const basePrediction = this.getPredictionWindow(prediction, window);
-    if (basePrediction === "") return prediction;
-    const options = this.data[basePrediction][windowPrediction];
-    if (options.length === 0) {
-      return ""
-    }
+  private growPrediction(base: string, windowPrediction: number): string {
+    const options = this.data[base][windowPrediction];
     const n = Math.random();
 
-    let t_prob = 0;
-    for (const key in options) {
+    let t_prob: number = 0;
+    for (let key in options) {
       if (t_prob + options[key] >= n) {
-        return prediction + key;
+        return key;
       } else {
         t_prob += options[key];
       }
     }
-    return prediction;
+    return "";
+  }
+
+  private recursiveGeneratePrediction(
+    prediction: string,
+    window: number,
+    windowPrediction: number,
+    minLength: number,
+    maxLength: number
+  ): string {
+    const closed: boolean = prediction.at(-1) === ".";
+    const longEnough: boolean = prediction.length > minLength;
+    const shortEnough: boolean = prediction.length <= maxLength + 1;
+
+    if (!shortEnough) {
+      return "";
+    }
+
+    if (closed && longEnough && shortEnough)
+      return this.validatePrediction(prediction);
+    else if (closed) {
+      return "";
+    }
+
+    const basePrediction: string = this.getPredictionWindow(prediction, window);
+    const grownPrediction: string =
+      prediction + this.growPrediction(basePrediction, windowPrediction);
+    return this.recursiveGeneratePrediction(
+      grownPrediction,
+      window,
+      windowPrediction,
+      minLength,
+      maxLength
+    );
   }
 
   private validatePrediction(prediction: string): string {
@@ -135,49 +170,27 @@ export class Markov implements IPredictor {
     return prediction.replace(".", "");
   }
 
-  private generatePrediction(config: {
-    window: number;
-    windowPredict: number;
-    minLength: number;
-    maxLength: number;
-  }): string {
-    let prediction = this.initPrediction(config.window);
-    for (let i = 0; i < config.maxLength; i++) {
-      prediction = this.growPrediction(
-        prediction,
-        config.window,
-        config.windowPredict
-      );
-
-      if (prediction === "" || prediction.length > config.maxLength + 1) {
-        break
-      }
-
-      if (prediction.at(-1) !== ".") {
-        continue
-      }
-
-      if (prediction.length > config.minLength) {
-        return this.validatePrediction(prediction);
-      } else {
-        break;
-      }
-    }
-    return "";
-  }
-
-  private recursivePredictionHandler(config: {
-    window: number;
-    windowPredict: number;
-    minLength: number;
-    maxLength: number;
-  },
+  private predictionHandler(
+    config: {
+      window: number;
+      windowPredict: number;
+      minLength: number;
+      maxLength: number;
+    },
     epoch = 1,
-    maxEpochs = 500): string {
-    if (maxEpochs < epoch) return ""
-    const prediction = this.generatePrediction(config);
-    return prediction === "" ? this.recursivePredictionHandler(config, epoch + 1, maxEpochs) : prediction;
-
+    maxEpochs = 150
+  ): string {
+    if (maxEpochs < epoch) return "";
+    const prediction: string = this.recursiveGeneratePrediction(
+      this.initPrediction(config.window),
+      config.window,
+      config.windowPredict,
+      config.minLength,
+      config.maxLength
+    );
+    return prediction === ""
+      ? this.predictionHandler(config, epoch + 1, maxEpochs)
+      : prediction;
   }
 
   predict(config: {
@@ -187,7 +200,7 @@ export class Markov implements IPredictor {
     maxLength: number;
     maxTries?: number;
   }): string {
-    return this.recursivePredictionHandler(config)
+    return this.predictionHandler(config);
   }
 
   evaluateProbability(prediction: string, config: any): number {
